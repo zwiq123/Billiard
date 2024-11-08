@@ -9,6 +9,7 @@ class Game{
         this.createCanvases();
         this.styleContainers();
         this.drawTable();
+        console.log("hello")
     }
 
     styleContainers(){
