@@ -14,3 +14,23 @@ body{
 canvas{
     border: 1px solid black;
 }
+
+#mainContainer{
+    width: 80vmax;
+    height: 40vmax;
+    min-width: 600px;
+    min-height: 300px;
+}    
+
+@media only screen and (orientation: portrait){
+    #mainContainer{
+        width: 80vmin;
+        height: 40vmin;
+        transform: rotate(90deg);
+    }
+}
+
+
+#tableCanvas{
+    
+}
