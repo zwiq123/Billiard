@@ -1,4 +1,4 @@
-import { Position } from "./position.js";
+import { Position } from "./utils.js";
 
 export class Ball{
     constructor(position, number = null){
