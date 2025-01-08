@@ -11,3 +11,7 @@ export class Vector{
         this.y = y;
     }
 }
+
+export function degreesToRadians(degrees){
+    return degrees * Math.PI / 180;
+}

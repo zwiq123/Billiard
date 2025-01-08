@@ -38,11 +38,65 @@ export class VisualManager{
         this.ctx.closePath();
     }
 
+    
+
     drawBall(ball){
         this.ctx.fillStyle = ball.color;
+
         this.ctx.beginPath();
         this.ctx.arc(ball.position.x, ball.position.y, this.game.BALLRADIUS, 0, 2*Math.PI);
         this.ctx.fill();
         this.ctx.closePath();
+        this.ctx.fillStyle = "white"
+
+        if(ball.number){
+            const textString = `${ball.number}`;
+            if(ball.side == "filled" || ball.number == 8){
+                this.ctx.beginPath();
+                this.ctx.arc(ball.position.x, ball.position.y, this.game.BALLRADIUS/2, 0, 2*Math.PI);
+                this.ctx.fill();
+                this.ctx.closePath();
+
+                this.ctx.save();
+                this.ctx.fillStyle = "black";
+                this.ctx.font = `bold ${this.game.BALLRADIUS*0.8}px Arial`;
+                this.ctx.translate(ball.position.x, ball.position.y);
+                this.ctx.rotate(Math.PI/2);
+                const textSize = this.ctx.measureText(textString);
+                this.ctx.fillText(`${ball.number}`, -(textSize.width/2), 6);
+                this.ctx.restore();
+            }else if(ball.side == "half-filled"){
+                this.ctx.beginPath();
+                this.ctx.arc(ball.position.x, ball.position.y, this.game.BALLRADIUS/2.5, 0, 2*Math.PI);
+                this.ctx.fill();
+                this.ctx.closePath();
+
+                this.ctx.beginPath();
+                this.ctx.arc(ball.position.x, ball.position.y, this.game.BALLRADIUS, degreesToRadians(300), degreesToRadians(60));
+                this.ctx.fill();
+                this.ctx.closePath();
+
+                this.ctx.beginPath();
+                this.ctx.arc(ball.position.x, ball.position.y, this.game.BALLRADIUS, degreesToRadians(120), degreesToRadians(240));
+                this.ctx.fill();
+                this.ctx.closePath();
+
+                this.ctx.save();
+                this.ctx.fillStyle = "black";
+                this.ctx.font = `bold ${this.game.BALLRADIUS*0.6}px Arial`;
+                const textSize = this.ctx.measureText(textString);
+                this.ctx.translate(ball.position.x, ball.position.y);
+                this.ctx.rotate(Math.PI/2);
+                this.ctx.fillText(`${ball.number}`, -(textSize.width/2), 4);
+                this.ctx.restore();
+            }
+
+            
+        }
+        
     }
+}
+
+function degreesToRadians(degrees){
+    return degrees * Math.PI / 180;
 }

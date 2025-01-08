@@ -16,8 +16,8 @@ canvas{
 }
 
 #mainContainer{
-    width: 80vmax;
-    height: 40vmax;
+    width: 90vmax;
+    height: 45vmax;
     min-width: 600px;
     min-height: 300px;
 }    
@@ -26,7 +26,7 @@ canvas{
     #mainContainer{
         width: 80vmin;
         height: 40vmin;
-        transform: rotate(90deg);
+        transform: rotate(-90deg);
     }
 }
 
