@@ -38,8 +38,6 @@ export class VisualManager{
         this.ctx.closePath();
     }
 
-    
-
     drawBall(ball){
         this.ctx.fillStyle = ball.color;
 
@@ -47,6 +45,18 @@ export class VisualManager{
         this.ctx.arc(ball.position.x, ball.position.y, this.game.BALLRADIUS, 0, 2*Math.PI);
         this.ctx.fill();
         this.ctx.closePath();
+        
+        if(ball.color === "white"){
+            if(this.game.isBallSelected){
+                this.ctx.strokeStyle = "#1749FF";
+                this.ctx.lineWidth = 4;
+                this.ctx.beginPath();
+                this.ctx.arc(ball.position.x, ball.position.y, this.game.BALLRADIUS-2, 0, 2*Math.PI);
+                this.ctx.stroke();
+                this.ctx.closePath();
+            }
+        }
+        
         this.ctx.fillStyle = "white"
 
         if(ball.number){
@@ -89,11 +99,8 @@ export class VisualManager{
                 this.ctx.rotate(Math.PI/2);
                 this.ctx.fillText(`${ball.number}`, -(textSize.width/2), 4);
                 this.ctx.restore();
-            }
-
-            
-        }
-        
+            } 
+        }  
     }
 }
 

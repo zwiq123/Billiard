@@ -1,6 +1,7 @@
 import {Ball} from "./ball.js";
 import { Position, Vector } from "./utils.js";
 import { VisualManager } from "./visualManager.js";
+import {MovementManager} from './movementManager.js'
 
 class Game{
     constructor(containerName){
@@ -10,6 +11,7 @@ class Game{
         this.HOLERADIUS = 30;
         this.BALLRADIUS = 20;
         this.balls = [];
+        this.isBallSelected = false;
 
         this.mainContainer = document.querySelector('#'+containerName);
         this.createCanvases();
@@ -17,10 +19,15 @@ class Game{
         this.visual.drawTable();
         this.createBalls();
         this.drawBalls();
+        this.movement = new MovementManager(this);
     }
 
     styleContainers(){
         this.mainContainer.id = "mainContainer";
+    }
+
+    getBalls(){
+        return this.balls;
     }
 
     createBalls(){
