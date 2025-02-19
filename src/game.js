@@ -31,7 +31,7 @@ class Game{
     }
 
     createBalls(){
-        this.balls.push(new Ball(new Position(this.WIDTH/4, this.HEIGHT/2)));
+        this.balls.push(new Ball(new Position(this.WIDTH/4, this.HEIGHT/2), 0));
         const ballNumbers = [
             [1],
             [9,2],
@@ -82,8 +82,21 @@ class Game{
         this.mainContainer.appendChild(tableCanvas);
         this.visual = new VisualManager(this);
     }
+
+    updateGame(){
+        this.movement.moveBallsAccordingly();
+        this.visual.drawTable();
+        this.drawBalls();
+    }
 }
 
 window.addEventListener("load", ()=>{
-    new Game("billard-table");
+    const game = new Game("billard-table");
+    function gameLoop(){
+        window.requestAnimationFrame(gameLoop);
+        game.updateGame();
+    }
+
+    gameLoop();
+
 })

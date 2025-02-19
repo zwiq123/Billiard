@@ -12,6 +12,13 @@ export class Vector{
     }
 }
 
+export class Movement{
+    constructor(velX, velY){
+        this.velX = velX;
+        this.velY = velY;
+    }
+}
+
 export function degreesToRadians(degrees){
     return degrees * Math.PI / 180;
 }

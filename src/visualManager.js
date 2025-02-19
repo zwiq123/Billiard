@@ -1,3 +1,5 @@
+import { degreesToRadians } from "./utils.js";
+
 export class VisualManager{
     
     constructor(game){
@@ -9,12 +11,6 @@ export class VisualManager{
         this.ctx.fillStyle = "#169149";
         this.ctx.fillRect(0,0,this.game.WIDTH, this.game.HEIGHT);
 
-        this.ctx.fillStyle = "#8f5d1b";
-        this.ctx.fillRect(0,0,this.game.WIDTH,this.game.BORDERWIDTH);
-        this.ctx.fillRect(0,0,this.game.BORDERWIDTH,this.game.HEIGHT);
-        this.ctx.fillRect(0,this.game.HEIGHT-this.game.BORDERWIDTH, this.game.WIDTH, this.game.HEIGHT);
-        this.ctx.fillRect(this.game.WIDTH-this.game.BORDERWIDTH,0,this.game.WIDTH, this.game.HEIGHT);
-
         this.ctx.fillStyle = "#117038";
         this.ctx.fillRect(this.game.BORDERWIDTH,this.game.BORDERWIDTH,this.game.WIDTH-2*this.game.BORDERWIDTH,this.game.HOLERADIUS);
         this.ctx.fillRect(this.game.BORDERWIDTH,this.game.BORDERWIDTH,this.game.HOLERADIUS,this.game.HEIGHT-2*this.game.BORDERWIDTH);
@@ -22,12 +18,30 @@ export class VisualManager{
         this.ctx.fillRect(this.game.WIDTH-this.game.BORDERWIDTH-this.game.HOLERADIUS,this.game.BORDERWIDTH,this.game.HOLERADIUS, this.game.HEIGHT-2*this.game.BORDERWIDTH);
 
 
+        this.ctx.fillStyle = "#8f5d1b";
+        this.ctx.fillRect(0,0,this.game.WIDTH,this.game.BORDERWIDTH);
+        this.ctx.fillRect(0,0,this.game.BORDERWIDTH,this.game.HEIGHT);
+        this.ctx.fillRect(0,this.game.HEIGHT-this.game.BORDERWIDTH, this.game.WIDTH, this.game.HEIGHT);
+        this.ctx.fillRect(this.game.WIDTH-this.game.BORDERWIDTH,0,this.game.WIDTH, this.game.HEIGHT);
+       
+        this.drawRotatedRect(this.game.BORDERWIDTH, this.game.BORDERWIDTH, 60, 60, 45)
+
         this.drawHole(this.game.BORDERWIDTH, this.game.BORDERWIDTH)
+
         this.drawHole(this.game.BORDERWIDTH, this.game.HEIGHT-this.game.BORDERWIDTH)
         this.drawHole(this.game.WIDTH/2, this.game.BORDERWIDTH)
         this.drawHole(this.game.WIDTH/2, this.game.HEIGHT-this.game.BORDERWIDTH)
         this.drawHole(this.game.WIDTH-this.game.BORDERWIDTH, this.game.BORDERWIDTH)
         this.drawHole(this.game.WIDTH-this.game.BORDERWIDTH, this.game.HEIGHT-this.game.BORDERWIDTH)
+    }
+
+    drawRotatedRect(x, y, width, height, rotation){
+        this.ctx.save();
+        this.ctx.fillStyle = "#169149";
+        this.ctx.translate(x, y);
+        this.ctx.rotate(degreesToRadians(rotation));
+        this.ctx.fillRect(0,0,width,height);
+        this.ctx.restore();
     }
 
     drawHole(centerX, centerY){
@@ -57,9 +71,9 @@ export class VisualManager{
             }
         }
         
-        this.ctx.fillStyle = "white"
+        this.ctx.fillStyle = "white";
 
-        if(ball.number){
+        if(ball.number != 0){
             const textString = `${ball.number}`;
             if(ball.side == "filled" || ball.number == 8){
                 this.ctx.beginPath();
@@ -102,8 +116,4 @@ export class VisualManager{
             } 
         }  
     }
-}
-
-function degreesToRadians(degrees){
-    return degrees * Math.PI / 180;
 }

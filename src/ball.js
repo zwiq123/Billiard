@@ -1,11 +1,12 @@
-import { Position } from "./utils.js";
+import { Position, Movement } from "./utils.js";
 
 export class Ball{
-    constructor(position, number = null){
+    constructor(position, number){
         this.position = new Position(position.x,position.y);
         this.number = number;
         this.color = this.getColorByNumber();
         this.side = this.getSideByNumber();
+        this.movement = new Movement(0, 0);
     }
 
     getColorByNumber(){
@@ -33,13 +34,13 @@ export class Ball{
                 return "rgb(148, 24, 24)";
             case 8:
                 return "black";
-            default:
+            case 0:
                 return "white";
         }
     }
 
     getSideByNumber(){
-        if(this.number === null || this.number === 8){
+        if(this.number === 0 || this.number === 8){
             return null;
         }
         if(this.number < 8){
