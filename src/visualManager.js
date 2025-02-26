@@ -5,6 +5,19 @@ export class VisualManager{
     constructor(game){
         this.game = game;
         this.ctx = game.tableCTX;
+        this.tableData = null;
+    }
+
+    async init(){
+        this.tableData = await this.fetchTableSizes();
+        return true;
+    }
+
+    fetchTableSizes(){
+        return new Promise((resolve) => {
+            fetch('./assets/table.json')
+            .then(data => {resolve(data.json());})
+        })
     }
 
     drawTable(){
@@ -12,19 +25,57 @@ export class VisualManager{
         this.ctx.fillRect(0,0,this.game.WIDTH, this.game.HEIGHT);
 
         this.ctx.fillStyle = "#117038";
-        this.ctx.fillRect(this.game.BORDERWIDTH,this.game.BORDERWIDTH,this.game.WIDTH-2*this.game.BORDERWIDTH,this.game.HOLERADIUS);
-        this.ctx.fillRect(this.game.BORDERWIDTH,this.game.BORDERWIDTH,this.game.HOLERADIUS,this.game.HEIGHT-2*this.game.BORDERWIDTH);
-        this.ctx.fillRect(this.game.BORDERWIDTH,this.game.HEIGHT-this.game.BORDERWIDTH-this.game.HOLERADIUS, this.game.WIDTH-2*this.game.BORDERWIDTH, this.game.HOLERADIUS);
-        this.ctx.fillRect(this.game.WIDTH-this.game.BORDERWIDTH-this.game.HOLERADIUS,this.game.BORDERWIDTH,this.game.HOLERADIUS, this.game.HEIGHT-2*this.game.BORDERWIDTH);
 
+        const SQRT2 = Math.sqrt(2);
+
+        //(horizontal view)
+        // this.ctx.beginPath()
+        // //top left
+        // this.ctx.moveTo(70,40);//lt
+        // this.ctx.lineTo(690, 40);//rt
+        // this.ctx.lineTo(690 - SQRT2*15, 70)//rb
+        // this.ctx.lineTo(70 + SQRT2*30, 70)//lb
+        // this.ctx.lineTo(70, 40);//lt
+        // this.ctx.fill()
+
+        // //top right
+        // this.ctx.moveTo(750, 40);
+        // this.ctx.lineTo(750+SQRT2*15, 70);
+        // this.ctx.lineTo(1370 - SQRT2*30, 70)
+        // this.ctx.lineTo(1370, 40)
+        // this.ctx.lineTo(750, 40);
+        // this.ctx.fill()
+
+        // //bottom left
+        // this.ctx.moveTo(70, 680);
+        // this.ctx.lineTo(70 + SQRT2*30, 650);
+        // this.ctx.lineTo(690 - SQRT2*15, 650)
+        // this.ctx.lineTo(690, 680)
+        // this.ctx.lineTo(70, 680);
+        // this.ctx.fill()
+
+        // //bottom right
+        // this.ctx.moveTo(750, 680);
+        // this.ctx.lineTo(750 + SQRT2*15, 650);
+        // this.ctx.lineTo(1370 - SQRT2*30, 650)
+        // this.ctx.lineTo(1370, 680)
+        // this.ctx.lineTo(750, 680);
+        // this.ctx.fill()
+
+        // //left
+        // this.ctx.moveTo(40,70);
+        // this.ctx.lineTo(70, 70 + SQRT2*30);
+        // this.ctx.lineTo(70, 650 - SQRT2*30)
+        // this.ctx.lineTo(40, 650)
+        // this.ctx.lineTo(40, 70);
+        // this.ctx.fill()
+        this.drawDarkTableSides();
 
         this.ctx.fillStyle = "#8f5d1b";
         this.ctx.fillRect(0,0,this.game.WIDTH,this.game.BORDERWIDTH);
         this.ctx.fillRect(0,0,this.game.BORDERWIDTH,this.game.HEIGHT);
         this.ctx.fillRect(0,this.game.HEIGHT-this.game.BORDERWIDTH, this.game.WIDTH, this.game.HEIGHT);
         this.ctx.fillRect(this.game.WIDTH-this.game.BORDERWIDTH,0,this.game.WIDTH, this.game.HEIGHT);
-       
-        this.drawRotatedRect(this.game.BORDERWIDTH, this.game.BORDERWIDTH, 60, 60, 45)
 
         this.drawHole(this.game.BORDERWIDTH, this.game.BORDERWIDTH)
 
@@ -33,6 +84,31 @@ export class VisualManager{
         this.drawHole(this.game.WIDTH/2, this.game.HEIGHT-this.game.BORDERWIDTH)
         this.drawHole(this.game.WIDTH-this.game.BORDERWIDTH, this.game.BORDERWIDTH)
         this.drawHole(this.game.WIDTH-this.game.BORDERWIDTH, this.game.HEIGHT-this.game.BORDERWIDTH)
+    }
+
+    drawDarkTableSides(){
+        const tableSidesData = this.tableData["table-sides"];
+        this.ctx.fillStyle = "#117038";
+        this.ctx.beginPath();
+
+        Object.keys(tableSidesData).forEach((key) => {
+            const sideData = tableSidesData[key];
+            this.setPivot(sideData["top-left"].x, sideData["top-left"].y, true);
+            this.setPivot(sideData["top-right"].x, sideData["top-right"].y, false);
+            this.setPivot(sideData["bottom-right"].x, sideData["bottom-right"].y, false)
+            this.setPivot(sideData["bottom-left"].x, sideData["bottom-left"].y, false)
+            this.setPivot(sideData["top-left"].x, sideData["top-left"].y, false);
+            this.ctx.fill()
+        })
+    }
+
+    setPivot(x,y, isStart){
+        const SQRT2 = Math.sqrt(2);
+        if(isStart){
+            this.ctx.moveTo(eval(x), eval(y))
+        }else{
+            this.ctx.lineTo(eval(x), eval(y))
+        }
     }
 
     drawRotatedRect(x, y, width, height, rotation){

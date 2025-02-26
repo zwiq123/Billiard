@@ -1,0 +1,48 @@
+{
+    "table-sides": {
+        "top-left":{
+            "top-left": {"x": 70, "y": 40},
+            "top-right": {"x": 690, "y": 40},
+            "bottom-right": {"x": "690 - SQRT2*15", "y": 70},
+            "bottom-left": {"x": "70 + SQRT2*30", "y": 70}
+        },
+        "bottom-left":{
+            "top-left": {"x": 0, "y": 0},
+            "top-right": {"x": 0, "y": 0},
+            "bottom-right": {"x": 0, "y": 0},
+            "bottom-left": {"x": 0, "y": 0}
+        },
+        "top-right":{
+            "top-left": {"x": 0, "y": 0},
+            "top-right": {"x": 0, "y": 0},
+            "bottom-right": {"x": 0, "y": 0},
+            "bottom-left": {"x": 0, "y": 0}
+        },
+        "bottom-right":{
+            "top-left": {"x": 0, "y": 0},
+            "top-right": {"x": 0, "y": 0},
+            "bottom-right": {"x": 0, "y": 0},
+            "bottom-left": {"x": 0, "y": 0}
+        },
+        "left":{
+            "top-left": {"x": 0, "y": 0},
+            "top-right": {"x": 0, "y": 0},
+            "bottom-right": {"x": 0, "y": 0},
+            "bottom-left": {"x": 0, "y": 0}
+        },
+        "right":{
+            "top-left": {"x": 0, "y": 0},
+            "top-right": {"x": 0, "y": 0},
+            "bottom-right": {"x": 0, "y": 0},
+            "bottom-left": {"x": 0, "y": 0}
+        }
+    },
+    "holes":[
+        {"x": 0, "y": 0},
+        {"x": 0, "y": 0},
+        {"x": 0, "y": 0},
+        {"x": 0, "y": 0},
+        {"x": 0, "y": 0},
+        {"x": 0, "y": 0}
+    ]
+}

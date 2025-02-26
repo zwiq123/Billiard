@@ -15,15 +15,15 @@ class Game{
 
         this.mainContainer = document.querySelector('#'+containerName);
         this.createCanvases();
-        this.styleContainers();
+    }
+
+    async init(){
+        const bool = await this.visual.init();
+        console.log(bool);
         this.visual.drawTable();
         this.createBalls();
         this.drawBalls();
         this.movement = new MovementManager(this);
-    }
-
-    styleContainers(){
-        this.mainContainer.id = "mainContainer";
     }
 
     getBalls(){
@@ -91,12 +91,16 @@ class Game{
 }
 
 window.addEventListener("load", ()=>{
-    const game = new Game("billard-table");
+    const game = new Game("mainContainer");
     function gameLoop(){
         window.requestAnimationFrame(gameLoop);
         game.updateGame();
     }
 
-    gameLoop();
+    async function startGame(){
+        await game.init();
+        gameLoop();
+    }
 
+    startGame();
 })
