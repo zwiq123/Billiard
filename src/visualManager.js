@@ -5,19 +5,6 @@ export class VisualManager{
     constructor(game){
         this.game = game;
         this.ctx = game.tableCTX;
-        this.tableData = null;
-    }
-
-    async init(){
-        this.tableData = await this.fetchTableSizes();
-        return true;
-    }
-
-    fetchTableSizes(){
-        return new Promise((resolve) => {
-            fetch('./assets/table.json')
-            .then(data => {resolve(data.json());})
-        })
     }
 
     drawTable(){
@@ -26,68 +13,13 @@ export class VisualManager{
 
         this.ctx.fillStyle = "#117038";
 
-        const SQRT2 = Math.sqrt(2);
-
-        //(horizontal view)
-        // this.ctx.beginPath()
-        // //top left
-        // this.ctx.moveTo(70,40);//lt
-        // this.ctx.lineTo(690, 40);//rt
-        // this.ctx.lineTo(690 - SQRT2*15, 70)//rb
-        // this.ctx.lineTo(70 + SQRT2*30, 70)//lb
-        // this.ctx.lineTo(70, 40);//lt
-        // this.ctx.fill()
-
-        // //top right
-        // this.ctx.moveTo(750, 40);
-        // this.ctx.lineTo(750+SQRT2*15, 70);
-        // this.ctx.lineTo(1370 - SQRT2*30, 70)
-        // this.ctx.lineTo(1370, 40)
-        // this.ctx.lineTo(750, 40);
-        // this.ctx.fill()
-
-        // //bottom left
-        // this.ctx.moveTo(70, 680);
-        // this.ctx.lineTo(70 + SQRT2*30, 650);
-        // this.ctx.lineTo(690 - SQRT2*15, 650)
-        // this.ctx.lineTo(690, 680)
-        // this.ctx.lineTo(70, 680);
-        // this.ctx.fill()
-
-        // //bottom right
-        // this.ctx.moveTo(750, 680);
-        // this.ctx.lineTo(750 + SQRT2*15, 650);
-        // this.ctx.lineTo(1370 - SQRT2*30, 650)
-        // this.ctx.lineTo(1370, 680)
-        // this.ctx.lineTo(750, 680);
-        // this.ctx.fill()
-
-        // //left
-        // this.ctx.moveTo(40,70);
-        // this.ctx.lineTo(70, 70 + SQRT2*30);
-        // this.ctx.lineTo(70, 650 - SQRT2*30)
-        // this.ctx.lineTo(40, 650)
-        // this.ctx.lineTo(40, 70);
-        // this.ctx.fill()
         this.drawDarkTableSides();
-
-        this.ctx.fillStyle = "#8f5d1b";
-        this.ctx.fillRect(0,0,this.game.WIDTH,this.game.BORDERWIDTH);
-        this.ctx.fillRect(0,0,this.game.BORDERWIDTH,this.game.HEIGHT);
-        this.ctx.fillRect(0,this.game.HEIGHT-this.game.BORDERWIDTH, this.game.WIDTH, this.game.HEIGHT);
-        this.ctx.fillRect(this.game.WIDTH-this.game.BORDERWIDTH,0,this.game.WIDTH, this.game.HEIGHT);
-
-        this.drawHole(this.game.BORDERWIDTH, this.game.BORDERWIDTH)
-
-        this.drawHole(this.game.BORDERWIDTH, this.game.HEIGHT-this.game.BORDERWIDTH)
-        this.drawHole(this.game.WIDTH/2, this.game.BORDERWIDTH)
-        this.drawHole(this.game.WIDTH/2, this.game.HEIGHT-this.game.BORDERWIDTH)
-        this.drawHole(this.game.WIDTH-this.game.BORDERWIDTH, this.game.BORDERWIDTH)
-        this.drawHole(this.game.WIDTH-this.game.BORDERWIDTH, this.game.HEIGHT-this.game.BORDERWIDTH)
+        this.drawWoodenTableSides();
+        this.drawHoles();
     }
 
     drawDarkTableSides(){
-        const tableSidesData = this.tableData["table-sides"];
+        const tableSidesData = this.game.tableData["table-sides"];
         this.ctx.fillStyle = "#117038";
         this.ctx.beginPath();
 
@@ -120,12 +52,29 @@ export class VisualManager{
         this.ctx.restore();
     }
 
+    drawHoles(){
+        this.ctx.fillStyle = "black";
+        const holeData = this.game.tableData["holes"];
+        holeData.forEach(hole => {
+            this.drawHole(hole.x, hole.y)
+        })
+    }
+
     drawHole(centerX, centerY){
+        const SQRT2 = Math.sqrt(2);
         this.ctx.fillStyle = "#141414";
         this.ctx.beginPath();
-        this.ctx.arc(centerX, centerY, this.game.HOLERADIUS, 0, 2*Math.PI);
+        this.ctx.arc(eval(centerX), eval(centerY), this.game.HOLERADIUS, 0, 2*Math.PI);
         this.ctx.fill();
         this.ctx.closePath();
+    }
+
+    drawWoodenTableSides(){
+        this.ctx.fillStyle = "#8f5d1b";
+        this.ctx.fillRect(0,0,this.game.WIDTH,this.game.BORDERWIDTH);
+        this.ctx.fillRect(0,0,this.game.BORDERWIDTH,this.game.HEIGHT);
+        this.ctx.fillRect(0,this.game.HEIGHT-this.game.BORDERWIDTH, this.game.WIDTH, this.game.HEIGHT);
+        this.ctx.fillRect(this.game.WIDTH-this.game.BORDERWIDTH,0,this.game.WIDTH, this.game.HEIGHT);
     }
 
     drawBall(ball){

@@ -7,6 +7,7 @@ export class Ball{
         this.color = this.getColorByNumber();
         this.side = this.getSideByNumber();
         this.movement = new Movement(0, 0);
+        this.timeSinceMovementStart = 0;
     }
 
     getColorByNumber(){

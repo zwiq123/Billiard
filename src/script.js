@@ -1,44 +1,30 @@
 import {Ball} from "./ball.js";
 import { Position, Vector } from "./utils.js";
 import { VisualManager } from "./visualManager.js";
-import {MovementManager} from './movementManager.js'
 
 class Game{
     constructor(containerName){
-        this.WIDTH = 1440;
+        this.WIDTH = 720;
         this.HEIGHT = this.WIDTH/2;
-        this.BORDERWIDTH = 40;
-        this.HOLERADIUS = 30;
-        this.BALLRADIUS = 20;
+        this.BORDERWIDTH = 20;
+        this.HOLERADIUS = 15;
+        this.BALLRADIUS = 10;
         this.balls = [];
-        this.isBallSelected = false;
 
         this.mainContainer = document.querySelector('#'+containerName);
         this.createCanvases();
-    }
-
-    async init(){
-        this.tableData = await this.fetchTableSizes();
-        this.visual = new VisualManager(this);
+        this.styleContainers();
         this.visual.drawTable();
         this.createBalls();
         this.drawBalls();
-        this.movement = new MovementManager(this);
     }
 
-    fetchTableSizes(){
-        return new Promise((resolve) => {
-            fetch('./assets/table.json')
-            .then(data => {resolve(data.json());})
-        })
-    }
-
-    getBalls(){
-        return this.balls;
+    styleContainers(){
+        this.mainContainer.id = "mainContainer";
     }
 
     createBalls(){
-        this.balls.push(new Ball(new Position(this.WIDTH/4, this.HEIGHT/2), 0));
+        this.balls.push(new Ball(new Position(this.WIDTH/4, this.HEIGHT/2)));
         const ballNumbers = [
             [1],
             [9,2],
@@ -87,26 +73,10 @@ class Game{
         tableCanvas.style.height = "100%";
         this.tableCTX = tableCanvas.getContext('2d');
         this.mainContainer.appendChild(tableCanvas);
-    }
-
-    updateGame(){
-        this.movement.moveBallsAccordingly();
-        this.visual.drawTable();
-        this.drawBalls();
+        this.visual = new VisualManager(this);
     }
 }
 
 window.addEventListener("load", ()=>{
-    const game = new Game("mainContainer");
-    function gameLoop(){
-        window.requestAnimationFrame(gameLoop);
-        game.updateGame();
-    }
-
-    async function startGame(){
-        await game.init();
-        gameLoop();
-    }
-
-    startGame();
+    new Game("billard-table");
 })
