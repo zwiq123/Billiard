@@ -1,10 +1,7 @@
-1. game initialization [X]
-2. table / holes [X]
-3. balls / ball placement [x]
-
-
-4. ball movement
-5. ball disposal
-6. players / turns
-7. animations / graphics
-8. bot
+conversion to typescript
+shapes (classes): collisions, drawing
+ball movement
+ball disposal
+players / turns
+animations / graphics
+bot
