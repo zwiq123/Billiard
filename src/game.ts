@@ -10,7 +10,10 @@ export default class Game{
     public BORDERWIDTH: number = 40;
     public HOLERADIUS: number = 30;
     public BALLRADIUS: number = 20;
+
     public balls: Ball[];
+    public walls: Polygon[];
+
     public isBallSelected: boolean;
     public mainContainer: HTMLDivElement;
     public tableData: any;
@@ -23,6 +26,7 @@ export default class Game{
         this.HOLERADIUS = 30;
         this.BALLRADIUS = 20;
         this.balls = [];
+        this.walls = [];
         this.isBallSelected = false;
 
         this.mainContainer = document.querySelector('#'+containerName)!;
@@ -34,6 +38,7 @@ export default class Game{
         this.visualManager = new VisualManager(this);
         this.visualManager.drawTable();
         this.createBalls();
+        this.createWalls();
         this.drawBalls();
         this.movementManager = new MovementManager(this);
     }
@@ -47,6 +52,21 @@ export default class Game{
 
     getBalls(){
         return this.balls;
+    }
+
+    createWalls(){
+        const tableSidesData = this.tableData["table-sides"];
+        const sideColor = "#117038";
+        const SQRT2 = Math.sqrt(2);
+
+        tableSidesData.map((side: {x: string | number, y: string | number}[]) => {
+            const vertices: Vector2[] = [];
+            side.map((vertex: {x: string | number, y: string | number}) => {
+                vertices.push(new Vector2(eval(String(vertex.x)), eval(String(vertex.y))))
+            })
+            const sidePolygon = new Polygon(sideColor, true, this.tableCTX, ...vertices); 
+            this.walls.push(sidePolygon);
+        })
     }
 
     createBalls(){

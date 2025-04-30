@@ -1,6 +1,57 @@
 import Ball from './ball.js'
 import Game from './game.js';
+import Polygon from './shapes/Polygon.js';
 import {Vector2, StraightLine, getPointDistanceFromLine} from './utils.js'
+
+interface Info{
+    distance: number,
+    a: Vector2,
+    b: Vector2
+}
+
+function dot(a: Vector2, b: Vector2){
+    return a.x*b.x + a.y*b.y;
+}
+
+class ComplexNum{
+    static fromPoint(p: Vector2): ComplexNum{
+        return new this(p.x, p.y);
+    }
+
+    static fromImaginary(im: number): ComplexNum{
+        return new this(0, im);
+    }
+
+    static fromReal(re: number): ComplexNum{
+        return new this(re, 0);
+    }
+
+    constructor(public re: number, public im: number){}
+
+    static add(a: ComplexNum, b: ComplexNum){
+        return new ComplexNum(a.re+b.re, a.im+b.im);
+    }
+
+    static subtract(a: ComplexNum, b: ComplexNum){
+        return new ComplexNum(a.re-b.re, a.im-b.im);
+    }
+
+    static divide(a: ComplexNum, b: ComplexNum){
+        const realPart = ((a.re*b.re) + (a.im*b.im)) / ((b.re)*(b.re) + (b.im)*(b.im));
+        const imaginaryPart = ((a.im*b.re) - (a.re*b.im)) / ((b.re)*(b.re) + (b.im)*(b.im));
+        return new ComplexNum(realPart, imaginaryPart);
+    }
+
+    static mulitply(a: ComplexNum, b: ComplexNum){
+        const realPart = (a.re*b.re) - (a.im*b.im);
+        const imaginaryPart = (a.re*b.im) + a.im*b.re;
+        return new ComplexNum(realPart, imaginaryPart);
+    }
+
+    static abs(x: ComplexNum){
+        return Math.sqrt(x.re*x.re + x.im*x.im);
+    }
+}
 
 export default class MovementManager{
     private game: Game;
@@ -74,7 +125,7 @@ export default class MovementManager{
             
             if(Math.pow(clickPos.y - this.whiteBall.position.x, 2) + Math.pow(clickPos.x-this.whiteBall.position.y, 2) <= Math.pow(this.game.BALLRADIUS,2)){
                 this.game.isBallSelected = true;
-                this.whiteBall.movement = new Vector2(8,6);
+                this.whiteBall.movement = new Vector2(0,30);
                 this.game.visualManager.drawBall(this.whiteBall);
             }else{
                 this.game.isBallSelected = false;
@@ -83,6 +134,34 @@ export default class MovementManager{
                 // this.whiteBall.timeSinceMovementStart = 0;
             }
         });
+    }
+
+    isBallTouchingWall(poly: Polygon, ball: Ball){
+
+        for(let i=0 ; i<poly.vertices.length ; i++){
+
+            const a = ComplexNum.fromPoint(poly.vertices[i]);
+            const b = ComplexNum.fromPoint(poly.vertices[(i + 1) % poly.vertices.length]);
+            const p = ComplexNum.fromPoint(ball.position);
+            const z = ComplexNum.divide(ComplexNum.subtract(p, a), ComplexNum.subtract(b, a));
+
+            if(z.re >= 0 && z.re <= 1){
+
+                const distance = ComplexNum.abs(ComplexNum.mulitply(ComplexNum.fromImaginary(z.im), ComplexNum.subtract(b, a)));
+                if (distance <= this.game.BALLRADIUS){
+                    return true;
+                }
+
+            }else{
+                const pa  = Math.sqrt(Math.pow(a.re - p.re, 2) + Math.pow(a.im - p.im, 2));
+                const pb  = Math.sqrt(Math.pow(b.re - p.re, 2) + Math.pow(b.im - p.im, 2));
+                const distance = Math.min(pa, pb);
+                if (distance <= this.game.BALLRADIUS){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     moveBallsAccordingly(){
@@ -96,6 +175,13 @@ export default class MovementManager{
             // this.isBallCollidingWithWall(ball);
             ball.position.x += ball.movement.x;
             ball.position.y += ball.movement.y;
+
+            for(const wall of this.game.walls){
+                if(this.isBallTouchingWall(wall, ball)){
+                    console.log("touch", wall, ball);
+                    ball.movement.y *= -1;
+                }
+            }
             // ball.timeSinceMovementStart++;
         }
     }

@@ -5,6 +5,18 @@ export class Vector2{
         this.x = x;
         this.y = y;
     }
+
+    static add(a: Vector2, b: Vector2){
+        return new Vector2(a.x+b.x, a.y+b.y)
+    }
+
+    static subtract(a: Vector2, b: Vector2){
+        return new Vector2(a.x-b.x, a.y-b.y);
+    }
+
+    static multiplyByNum(a: Vector2, scalar: number){
+        return new Vector2(a.x*scalar, a.y*scalar);
+    }
 }
 
 export class StraightLine{

@@ -11,6 +11,7 @@ import Ball from "./ball.js";
 import { Vector2 } from "./utils.js";
 import VisualManager from "./visualManager.js";
 import MovementManager from './movementManager.js';
+import Polygon from "./shapes/Polygon.js";
 export default class Game {
     constructor(containerName) {
         this.WIDTH = 1440;
@@ -22,6 +23,7 @@ export default class Game {
         this.HOLERADIUS = 30;
         this.BALLRADIUS = 20;
         this.balls = [];
+        this.walls = [];
         this.isBallSelected = false;
         this.mainContainer = document.querySelector('#' + containerName);
         this.createCanvases();
@@ -32,6 +34,7 @@ export default class Game {
             this.visualManager = new VisualManager(this);
             this.visualManager.drawTable();
             this.createBalls();
+            this.createWalls();
             this.drawBalls();
             this.movementManager = new MovementManager(this);
         });
@@ -44,6 +47,19 @@ export default class Game {
     }
     getBalls() {
         return this.balls;
+    }
+    createWalls() {
+        const tableSidesData = this.tableData["table-sides"];
+        const sideColor = "#117038";
+        const SQRT2 = Math.sqrt(2);
+        tableSidesData.map((side) => {
+            const vertices = [];
+            side.map((vertex) => {
+                vertices.push(new Vector2(eval(String(vertex.x)), eval(String(vertex.y))));
+            });
+            const sidePolygon = new Polygon(sideColor, true, this.tableCTX, ...vertices);
+            this.walls.push(sidePolygon);
+        });
     }
     createBalls() {
         this.balls.push(new Ball(new Vector2(this.WIDTH / 4, this.HEIGHT / 2), 0));

@@ -1,5 +1,4 @@
 import { Vector2, degreesToRadians } from "./utils.js";
-import Polygon from "./shapes/Polygon.js";
 import Circle from "./shapes/Circle.js";
 export default class VisualManager {
     constructor(game) {
@@ -15,17 +14,9 @@ export default class VisualManager {
         this.drawHoles();
     }
     drawDarkTableSides() {
-        const tableSidesData = this.game.tableData["table-sides"];
-        const sideColor = "#117038";
-        const SQRT2 = Math.sqrt(2);
-        tableSidesData.map((side) => {
-            const vertices = [];
-            side.map((vertex) => {
-                vertices.push(new Vector2(eval(String(vertex.x)), eval(String(vertex.y))));
-            });
-            const sidePolygon = new Polygon(sideColor, true, this.ctx, ...vertices);
-            sidePolygon.draw();
-        });
+        for (const wall of this.game.walls) {
+            wall.draw();
+        }
         // this.ctx.beginPath();
         // Object.keys(tableSidesData).forEach((key) => {
         //     const sideData = tableSidesData[key];

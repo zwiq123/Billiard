@@ -24,18 +24,9 @@ export default class VisualManager{
     }
 
     drawDarkTableSides(){
-        const tableSidesData = this.game.tableData["table-sides"];
-        const sideColor = "#117038";
-        const SQRT2 = Math.sqrt(2);
-
-        tableSidesData.map((side: {x: string | number, y: string | number}[]) => {
-            const vertices: Vector2[] = [];
-            side.map((vertex: {x: string | number, y: string | number}) => {
-                vertices.push(new Vector2(eval(String(vertex.x)), eval(String(vertex.y))))
-            })
-            const sidePolygon = new Polygon(sideColor, true, this.ctx, ...vertices); 
-            sidePolygon.draw();
-        })
+        for(const wall of this.game.walls){
+            wall.draw();
+        }
 
         // this.ctx.beginPath();
 
