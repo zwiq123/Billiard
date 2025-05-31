@@ -1,4 +1,7 @@
 import { Vector2 } from './utils.js';
+function dot(a, b) {
+    return a.x * b.x + a.y * b.y;
+}
 class ComplexNum {
     static fromPoint(p) {
         return new this(p.x, p.y);

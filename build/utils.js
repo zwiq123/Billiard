@@ -3,6 +3,15 @@ export class Vector2 {
         this.x = x;
         this.y = y;
     }
+    static add(a, b) {
+        return new Vector2(a.x + b.x, a.y + b.y);
+    }
+    static subtract(a, b) {
+        return new Vector2(a.x - b.x, a.y - b.y);
+    }
+    static multiplyByNum(a, scalar) {
+        return new Vector2(a.x * scalar, a.y * scalar);
+    }
 }
 export class StraightLine {
     constructor(startPoint, endPoint) {
