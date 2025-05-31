@@ -1,8 +1,7 @@
 import {Vector2, degreesToRadians} from "./utils.js";
 import Game from './game.js'
-import Ball from "./ball.js";
-import Polygon from "./shapes/Polygon.js";
-import Circle from "./shapes/Circle.js";
+import { Ball, BallSide } from "./ball.js";
+import { Polygon, Circle } from "./Shapes.js";
 
 export default class VisualManager{
     private game: Game;
@@ -27,18 +26,12 @@ export default class VisualManager{
         for(const wall of this.game.walls){
             wall.draw();
         }
+    }
 
-        // this.ctx.beginPath();
-
-        // Object.keys(tableSidesData).forEach((key) => {
-        //     const sideData = tableSidesData[key];
-        //     this.setPivot(sideData["top-left"].x, sideData["top-left"].y, true);
-        //     this.setPivot(sideData["top-right"].x, sideData["top-right"].y, false);
-        //     this.setPivot(sideData["bottom-right"].x, sideData["bottom-right"].y, false)
-        //     this.setPivot(sideData["bottom-left"].x, sideData["bottom-left"].y, false)
-        //     this.setPivot(sideData["top-left"].x, sideData["top-left"].y, false);
-        //     this.ctx.fill()
-        // })
+    drawHoles(){
+        for(const hole of this.game.holes){
+            hole.draw();
+        }
     }
 
     setPivot(x: number, y: number, isStart: boolean){
@@ -59,25 +52,6 @@ export default class VisualManager{
         this.ctx.restore();
     }
 
-    drawHoles(){
-        const holeColor = "black";
-        const SQRT2 = Math.sqrt(2);
-        const holeData = this.game.tableData["holes"];
-        holeData.forEach((hole: Vector2) => {
-            const holeCircle = new Circle(holeColor, false, this.ctx, new Vector2(eval(String(hole.x)), eval(String(hole.y))), this.game.HOLERADIUS);
-            holeCircle.draw();
-        })
-    }
-
-    drawHole(centerX: number, centerY: number){
-        const SQRT2 = Math.sqrt(2);
-        this.ctx.fillStyle = "#141414";
-        this.ctx.beginPath();
-        this.ctx.arc(eval(String(centerX)), eval(String(centerY)), this.game.HOLERADIUS, 0, 2*Math.PI);
-        this.ctx.fill();
-        this.ctx.closePath();
-    }
-
     drawWoodenTableSides(){
         this.ctx.fillStyle = "#8f5d1b";
         this.ctx.fillRect(0,0,this.game.WIDTH,this.game.BORDERWIDTH);
@@ -87,63 +61,58 @@ export default class VisualManager{
     }
 
     drawBall(ball: Ball){
-        this.ctx.fillStyle = ball.color;
-
-        this.ctx.beginPath();
-        this.ctx.arc(ball.position.x, ball.position.y, this.game.BALLRADIUS, 0, 2*Math.PI);
-        this.ctx.fill();
-        this.ctx.closePath();
+        ball.draw();
         
-        if(ball.color === "white"){
-            if(this.game.isBallSelected){
-                this.ctx.strokeStyle = "#1749FF";
-                this.ctx.lineWidth = 4;
-                this.ctx.beginPath();
-                this.ctx.arc(ball.position.x, ball.position.y, this.game.BALLRADIUS-2, 0, 2*Math.PI);
-                this.ctx.stroke();
-                this.ctx.closePath();
-            }
-        }
+        // if(ball.color === "white"){
+        //     if(this.game.isBallSelected){
+        //         this.ctx.strokeStyle = "#1749FF";
+        //         this.ctx.lineWidth = 4;
+        //         this.ctx.beginPath();
+        //         this.ctx.arc(ball.center.x, ball.center.y, ball.radius-2, 0, 2*Math.PI);
+        //         this.ctx.stroke();
+        //         this.ctx.closePath();
+        //     }
+        // }
         
         this.ctx.fillStyle = "white";
 
         if(ball.number != 0){
             const textString = `${ball.number}`;
-            if(ball.side == "filled" || ball.number == 8){
+            if(ball.side == BallSide.FILLED || ball.number == 8){
                 this.ctx.beginPath();
-                this.ctx.arc(ball.position.x, ball.position.y, this.game.BALLRADIUS/2, 0, 2*Math.PI);
+                this.ctx.arc(ball.center.x, ball.center.y, ball.radius/2, 0, 2*Math.PI);
                 this.ctx.fill();
                 this.ctx.closePath();
 
                 this.ctx.save();
                 this.ctx.fillStyle = "black";
-                this.ctx.font = `bold ${this.game.BALLRADIUS*0.8}px Arial`;
-                this.ctx.translate(ball.position.x, ball.position.y);
+                this.ctx.font = `bold ${ball.radius*0.8}px Arial`;
+                this.ctx.translate(ball.center.x, ball.center.y);
                 this.ctx.rotate(Math.PI/2);
                 const textSize = this.ctx.measureText(textString);
                 this.ctx.fillText(`${ball.number}`, -(textSize.width/2), 6);
                 this.ctx.restore();
-            }else if(ball.side == "half-filled"){
+            }else if(ball.side == BallSide.HALF_FILLED){
                 this.ctx.beginPath();
-                this.ctx.arc(ball.position.x, ball.position.y, this.game.BALLRADIUS/2.5, 0, 2*Math.PI);
+                this.ctx.arc(ball.center.x, ball.center.y, ball.radius/2.5, 0, 2*Math.PI);
                 this.ctx.fill();
                 this.ctx.closePath();
 
                 this.ctx.beginPath();
-                this.ctx.arc(ball.position.x, ball.position.y, this.game.BALLRADIUS, degreesToRadians(300), degreesToRadians(60));
+                this.ctx.arc(ball.center.x, ball.center.y, ball.radius, degreesToRadians(300), degreesToRadians(60));
                 this.ctx.fill();
                 this.ctx.closePath();
 
                 this.ctx.beginPath();
-                this.ctx.arc(ball.position.x, ball.position.y, this.game.BALLRADIUS, degreesToRadians(120), degreesToRadians(240));
+                this.ctx.arc(ball.center.x, ball.center.y, ball.radius, degreesToRadians(120), degreesToRadians(240));
                 this.ctx.fill();
                 this.ctx.closePath();
 
                 this.ctx.save();
                 this.ctx.fillStyle = "black";
-                this.ctx.font = `bold ${this.game.BALLRADIUS*0.6}px Arial`;
+                this.ctx.font = `bold ${ball.radius*0.6}px Arial`;
                 const textSize = this.ctx.measureText(textString);
-                this.ctx.translate(ball.position.x, ball.position.y);
+                this.ctx.translate(ball.center.x, ball.center.y);
                 this.ctx.rotate(Math.PI/2);
                 this.ctx.fillText(`${ball.number}`, -(textSize.width/2), 4);
                 this.ctx.restore();

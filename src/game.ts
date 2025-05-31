@@ -1,8 +1,8 @@
-import Ball from "./ball.js";
-import {Vector2} from "./utils.js";
+import { Ball } from "./ball.js";
+import { Vector2 } from "./utils.js";
 import VisualManager from "./visualManager.js";
 import MovementManager from './movementManager.js'
-import Polygon from "./shapes/Polygon.js"; 
+import { Polygon, Circle } from "./Shapes.js";
 
 export default class Game{
     public WIDTH: number = 1440;
@@ -13,6 +13,7 @@ export default class Game{
 
     public balls: Ball[];
     public walls: Polygon[];
+    public holes: Circle[];
 
     public isBallSelected: boolean;
     public mainContainer: HTMLDivElement;
@@ -27,6 +28,7 @@ export default class Game{
         this.BALLRADIUS = 20;
         this.balls = [];
         this.walls = [];
+        this.holes = [];
         this.isBallSelected = false;
 
         this.mainContainer = document.querySelector('#'+containerName)!;
@@ -39,6 +41,7 @@ export default class Game{
         this.visualManager.drawTable();
         this.createBalls();
         this.createWalls();
+        this.createHoles();
         this.drawBalls();
         this.movementManager = new MovementManager(this);
     }
@@ -48,10 +51,6 @@ export default class Game{
             fetch('./assets/table.json')
             .then(data => {resolve(data.json());})
         })
-    }
-
-    getBalls(){
-        return this.balls;
     }
 
     createWalls(){
@@ -69,8 +68,21 @@ export default class Game{
         })
     }
 
+    createHoles(){
+        const tableHoleData = this.tableData["holes"];
+        const holeColor = "#141414";
+        // const holeColor = "black";
+        const SQRT2 = Math.sqrt(2);
+
+        tableHoleData.map((holeCenter: {x: string | number, y: string | number}) => {
+            const center = new Vector2(eval(String(holeCenter.x)), eval(String(holeCenter.y)));
+            const holeCircle = new Circle(holeColor, false, this.tableCTX, center, this.HOLERADIUS);
+            this.holes.push(holeCircle);
+        })
+    }
+
     createBalls(){
-        this.balls.push(new Ball(new Vector2(this.WIDTH/4, this.HEIGHT/2), 0));
+        this.balls.push(new Ball(this.tableCTX, new Vector2(this.WIDTH/4, this.HEIGHT/2), this.BALLRADIUS));
         const ballNumbers = [
             [1],
             [9,2],
@@ -100,7 +112,7 @@ export default class Game{
 
         for(let i=0;i<ballPositions.length;i++){
             for(let j=0;j<ballPositions[i].length;j++){
-                this.balls.push(new Ball(ballPositions[i][j], ballNumbers[i][j]));
+                this.balls.push(new Ball(this.tableCTX, ballPositions[i][j], this.BALLRADIUS, {number: ballNumbers[i][j]}));
             }
         }
     }

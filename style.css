@@ -9,6 +9,7 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
+    background: linear-gradient(135deg, rgb(90, 131, 255), rgb(0, 198, 238))
 }
 
 canvas{

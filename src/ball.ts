@@ -1,62 +1,49 @@
-import {Vector2} from "./utils.js";
+import { Vector2 } from "./utils.js";
+import { Circle } from "./Shapes.js";
 
-export default class Ball{
-    public position: Vector2;
+const BALL_COLORS: Record<number, string> = {
+    1: "rgb(255, 223, 44)",
+    9: "rgb(255, 223, 44)", 
+    2: "rgb(24, 51, 249)",
+    10: "rgb(24, 51, 249)",
+    3: "rgb(252, 25, 25)",
+    11: "rgb(252, 25, 25)",
+    4: "rgb(95, 37, 255)",
+    12: "rgb(95, 37, 255)",
+    5: "rgb(255, 149, 37)",
+    13: "rgb(255, 149, 37)",
+    6: "rgb(18, 188, 43)",
+    14: "rgb(18, 188, 43)",
+    7: "rgb(148, 24, 24)",
+    15: "rgb(148, 24, 24)",
+    8: "black",
+    0: "white"
+};
+
+export enum BallSide {
+    FILLED = "filled",
+    HALF_FILLED = "half-filled",
+    NONE = "none"
+}
+
+export class Ball extends Circle{
     public number: number;
-    public color: string;
     public side: string | null;
-    public movement: Vector2;
-    constructor(position: Vector2, number: number){
-        this.position = new Vector2(position.x, position.y);
+    constructor(ctx: CanvasRenderingContext2D, centerPos: Vector2, radius: number, {collisions = true, number = 0, velocity = new Vector2(0, 0)} = {}){
+        super(Ball.getColorByNumber(number), collisions, ctx, centerPos, radius, {velocity: velocity});
+        this.side = Ball.getSideByNumber(number);
         this.number = number;
-        this.color = this.getColorByNumber();
-        this.side = this.getSideByNumber();
-        this.movement = new Vector2(0, 0);
-        // this.timeSinceMovementStart = 0;
     }
 
-    getColorByNumber(): string{
-        switch(this.number){
-            case 1:
-            case 9:
-                return "rgb(255, 223, 44)";
-            case 2:
-            case 10:
-                return "rgb(24, 51, 249)";
-            case 3:
-            case 11:
-                return "rgb(252, 25, 25)";
-            case 4:
-            case 12:
-                return "rgb(95, 37, 255)";
-            case 5:
-            case 13:
-                return "rgb(255, 149, 37)";
-            case 6:
-            case 14:
-                return "rgb(18, 188, 43)";
-            case 7:
-            case 15:
-                return "rgb(148, 24, 24)";
-            case 8:
-                return "black";
-            case 0:
-                return "white";
-            default:
-                return "white";
-        }
+    static getColorByNumber(number: number): string{
+        return BALL_COLORS[number] ?? "white";
     }
 
-    getSideByNumber(): string | null{
-        if(this.number === 0 || this.number === 8){
-            return null;
-        }
-        if(this.number < 8){
-            return "filled";
-        }
-        if(this.number < 16){
-            return "half-filled";
-        }
-        return null;
+     static getSideByNumber(number: number): BallSide | null{
+        if(number === 0 || number === 8) return BallSide.NONE;
+        if(number < 8) return BallSide.FILLED;
+        if(number < 16) return BallSide.HALF_FILLED;
+        return BallSide.NONE;
     }
 }
+

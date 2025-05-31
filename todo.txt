@@ -1,7 +1,16 @@
-conversion to typescript
-shapes (classes): collisions, drawing
-ball movement
-ball disposal
-players / turns
-animations / graphics
-bot
+[ ] fix collisions on corners
+[ ] fix ball collisions
+[ ] add PlayerManager
+[ ] add players
+[ ] make balls go to player pockets after going into holes + white ball reappear
+[ ] move collisions
+[ ] revamp collisions to remove Complex Numbers
+[ ] add the stick and make it function properly
+[ ] add a GLOBALS.json file
+[ ] make players have turns
+[ ] add players ui
+[ ] add the white ball placement functions (+ research)
+[ ] add the black ball finish (+ research)
+[ ] add ball disposal animations
+[ ] add menu
+[ ] add bot
