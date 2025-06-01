@@ -1,10 +1,11 @@
-[ ] fix collisions on corners
-[ ] fix ball collisions
+[x] fix collisions on corners
+[x] fix ball collisions
+[ ] fix high-speed ball-wall collisions (implement swept collision detection)
 [ ] add PlayerManager
 [ ] add players
 [ ] make balls go to player pockets after going into holes + white ball reappear
 [ ] move collisions
-[ ] revamp collisions to remove Complex Numbers
+[x] revamp collisions to remove Complex Numbers
 [ ] add the stick and make it function properly
 [ ] add a GLOBALS.json file
 [ ] make players have turns

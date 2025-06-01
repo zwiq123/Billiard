@@ -1,7 +1,7 @@
 import { Ball } from './ball.js'
 import Game from './game.js';
 import { Polygon } from './Shapes.js';
-import { Vector2, ComplexNum } from './utils.js'
+import { Vector2 } from './utils.js'
 
 export default class MovementManager{
     private game: Game;
@@ -44,71 +44,78 @@ export default class MovementManager{
         })
     }
 
-    isBallTouchingWall(poly: Polygon, ball: Ball): { hit: boolean, wallStart?: Vector2, wallEnd?: Vector2 } {
+    isBallTouchingWall(poly: Polygon, ball: Ball): { hit: boolean, wallStart?: Vector2, wallEnd?: Vector2, nearestPoint?: Vector2 }{
 
-        for(let i=0 ; i<poly.vertices.length ; i++){
+        let minDist = Infinity;
+        let nearestPoint = undefined;
+        let wallStart = undefined;
+        let wallEnd = undefined;
+        for(let i = 0 ; i < poly.vertices.length ; i++){
+            const a = poly.vertices[i];
+            const b = poly.vertices[(i + 1) % poly.vertices.length];
 
-            const a = ComplexNum.fromPoint(poly.vertices[i]);
-            const b = ComplexNum.fromPoint(poly.vertices[(i + 1) % poly.vertices.length]);
-            const p = ComplexNum.fromPoint(ball.center);
-            const z = ComplexNum.divide(ComplexNum.subtract(p, a), ComplexNum.subtract(b, a));
+            const ab = Vector2.subtract(b, a);
+            const t = Math.max(0, Math.min(1, Vector2.dot(Vector2.subtract(ball.center, a), ab) / ab.length() ** 2));
+            const proj = Vector2.add(a, Vector2.multiplyByNum(ab, t));
+            const dist = Vector2.subtract(ball.center, proj).length();
 
-            if(z.re >= 0 && z.re <= 1){
-
-                const distance = ComplexNum.abs(ComplexNum.mulitply(ComplexNum.fromImaginary(z.im), ComplexNum.subtract(b, a)));
-                if (distance <= ball.radius){
-                    return {
-                        hit: true,
-                        wallStart: poly.vertices[i],
-                        wallEnd: poly.vertices[(i + 1) % poly.vertices.length]
-                    }
-                }
-
-            }else{
-                const pa = Math.hypot(a.re - p.re, a.im - p.im);
-                const pb = Math.hypot(b.re - p.re, b.im - p.im);
-                const distance = Math.min(pa, pb);
-                if (distance <= ball.radius){
-                    return {
-                        hit: true,
-                        wallStart: pa < pb ? poly.vertices[i] : poly.vertices[(i + 1) % poly.vertices.length],
-                        wallEnd: pa < pb ? poly.vertices[i] : poly.vertices[(i + 1) % poly.vertices.length]
-                    }
-                }
+            if(dist < minDist) {
+                minDist = dist;
+                nearestPoint = proj;
+                wallStart = a;
+                wallEnd = b;
             }
         }
-        return { hit: false };
+        if(minDist <= ball.radius){
+            return {hit: true, wallStart, wallEnd, nearestPoint};
+        }
+        return {hit: false};
     }
 
-    reflectBallOffWall(ball: Ball, wallStart: Vector2, wallEnd: Vector2): void{
-        //V′ = V − 2 * (V ⋅ N) * N
-
-        const wall = Vector2.subtract(wallEnd, wallStart);
-        const normal = new Vector2(-wall.y, wall.x).normalized();
+    reflectBallOffWall(ball: Ball, normal: Vector2): void{
         ball.velocity = Vector2.reflect(ball.velocity, normal);
     }
 
     areBallsTouching(ballA: Ball, ballB: Ball){
-        return Vector2.subtract(ballA.center, ballB.center).length() <= ballA.radius*2;
+        return Vector2.subtract(ballA.center, ballB.center).length() <= ballA.radius + ballB.radius;
     }
 
     reflectBalls(ballA: Ball, ballB: Ball){
+
         const normal = Vector2.subtract(ballA.center, ballB.center).normalized();
         const relativeVelocity = Vector2.subtract(ballA.velocity, ballB.velocity);
         const velocityAlongNormal = Vector2.dot(relativeVelocity, normal);
 
-        if(velocityAlongNormal > 0) return;
+        if (velocityAlongNormal > 0) return;
 
-        const impulse = -2 * velocityAlongNormal / 2;
+        const restitution = 1;
+        const impulseMagnitude = -(1 + restitution) * velocityAlongNormal / 2;
 
-        ballA.velocity = Vector2.add(ballA.velocity, Vector2.multiplyByNum(normal, impulse));
-        ballB.velocity = Vector2.add(ballB.velocity, Vector2.multiplyByNum(normal, impulse));
+        const impulse = Vector2.multiplyByNum(normal, impulseMagnitude);
 
-        //in some cases the balls overlap and when they reflect they kind of glitch in each other
-        // const overlap = ballA.radius + ballB.radius - Vector2.subtract(ballB.center, ballA.center).length();
-        // const correction = Vector2.multiplyByNum(normal, overlap / 2);
-        // ballA.center = Vector2.subtract(ballA.center, correction);
-        // ballB.center = Vector2.add(ballB.center, correction);
+        ballA.velocity = Vector2.add(ballA.velocity, impulse);
+        ballB.velocity = Vector2.subtract(ballB.velocity, impulse);
+
+        const distance = Vector2.subtract(ballA.center, ballB.center).length();
+        const overlap = ballA.radius + ballB.radius - distance;
+        if (overlap > 0) {
+            const correction = Vector2.multiplyByNum(normal, overlap / 2 + 0.01); // Adding a small value to prevent sticking
+            ballA.center = Vector2.add(ballA.center, correction);
+            ballB.center = Vector2.subtract(ballB.center, correction);
+        }
+    }
+
+    resolveBallCollisions(){
+        for(let j = 0 ; j < this.game.balls.length ; j++){
+            for(let k = j + 1 ; k < this.game.balls.length ; k++){
+                const ballA = this.game.balls[j];
+                const ballB = this.game.balls[k];
+
+                if(this.areBallsTouching(ballA, ballB)){
+                    this.reflectBalls(ballA, ballB);
+                }
+            }
+        }
     }
 
     moveBallsAccordingly(){
@@ -123,17 +130,14 @@ export default class MovementManager{
             for(const wall of this.game.walls){
                 const collision = this.isBallTouchingWall(wall, ball);
                 if(collision.hit){
-                    console.log("touch", wall, ball);
-                    this.reflectBallOffWall(ball, collision.wallStart!, collision.wallEnd!);
+                    const normal = Vector2.getWallNormal(collision.wallStart!, collision.wallEnd!);
+                    const pushDir = Vector2.subtract(ball.center, collision.nearestPoint!).normalized();
+                    ball.center = Vector2.add(collision.nearestPoint!, Vector2.multiplyByNum(pushDir, ball.radius + 0.01));
+                    this.reflectBallOffWall(ball, normal);
                 }
             }
 
-            for(let j = i + 1 ; j < this.game.balls.length ; j++){
-                const ballToCollide = this.game.balls[j]
-                if(this.areBallsTouching(ball, ballToCollide)){
-                    this.reflectBalls(ball, ballToCollide);
-                }
-            }
+            this.resolveBallCollisions();
         }
     }
 
