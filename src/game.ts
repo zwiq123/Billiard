@@ -15,7 +15,6 @@ export default class Game{
     public walls: Polygon[];
     public holes: Circle[];
 
-    public isBallSelected: boolean;
     public mainContainer: HTMLDivElement;
     public tableData: any;
     public visualManager: VisualManager;
@@ -29,7 +28,6 @@ export default class Game{
         this.balls = [];
         this.walls = [];
         this.holes = [];
-        this.isBallSelected = false;
 
         this.mainContainer = document.querySelector('#'+containerName)!;
         this.createCanvases();
