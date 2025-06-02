@@ -1,6 +1,6 @@
 import { Ball } from './ball.js'
 import Game from './game.js';
-import { Polygon } from './Shapes.js';
+import { Polygon, Circle } from './Shapes.js';
 import { Vector2 } from './utils.js'
 
 export default class MovementManager{
@@ -33,9 +33,9 @@ export default class MovementManager{
                 clickPos = new Vector2(clickX, clickY);
             }
 
-            console.log(clickPos, this.whiteBall.center)
+            // console.log(clickPos, this.whiteBall.center)
 
-            const newVelocity = Vector2.multiplyByNum(Vector2.fromPoints(this.whiteBall.center, clickPos), 0.05);
+            const newVelocity = Vector2.multiplyByNum(Vector2.fromPoints(this.whiteBall.center, clickPos), 0.075);
             this.whiteBall.velocity = newVelocity;
         });
 
@@ -116,7 +116,7 @@ export default class MovementManager{
                 }
             }
         }
-    }
+    } 
 
     moveBallsAccordingly(){
         for(let i=0; i < this.game.balls.length ; i++){

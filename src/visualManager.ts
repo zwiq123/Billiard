@@ -75,6 +75,16 @@ export default class VisualManager{
         // }
         
         this.ctx.fillStyle = "white";
+        if(ball.color == "white"){
+            const end = Vector2.add(ball.center, ball.velocity)
+            if(Vector2.subtract(end, ball.center).length() > ball.radius + 30){
+                const vel = new Circle("red", false, this.game.tableCTX, Vector2.add(ball.center, ball.velocity), ball.radius/4);
+                vel.draw();
+            }else{
+                const vel = new Circle("blue", false, this.game.tableCTX, Vector2.add(ball.center, ball.velocity), ball.radius/4);
+                vel.draw();
+            }
+        }
 
         if(ball.number != 0){
             const textString = `${ball.number}`;
