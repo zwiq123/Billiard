@@ -9,7 +9,17 @@
 [x] make the text on balls actually centered
 [x?] make balls spin
 
-[ ] add the stick and make it function properly
+[x] add the stick
+[ ] determine when it's time to use the stick
+[ ] make the stick appear only when it's time
+[ ] make the stick follow the player's cursor
+[ ] make the player's cursor the ball outline
+[ ] draw the trajectory
+[ ] make tooltips
+[ ] make the stick lock/unlock + tooltips
+[ ] add stick power
+[ ] add stick animation
+
 [ ] add players
 [ ] add PlayerManager (player "banks" + research (names))
 [ ] make balls go to player pockets after going into holes + white ball reappear
@@ -21,25 +31,3 @@
 [ ] add the black ball finish (+ research)
 [ ] add menu
 [ ] add bot
-
-
-Game:
- - start
- - end
- - loop
-
-Visual:
- - drawing
-
-Collision:
- - collisions
-
-Movement:
- - Movement
- - collision calls
- - ball in holes
- - stick
-
-Player:
- - turns
- - points

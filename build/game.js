@@ -24,6 +24,7 @@ export default class Game {
         this.tableBorders = [];
         this.mainContainer = document.querySelector('#' + containerName);
         this.createCanvases();
+        this.repositionContainer();
     }
     init() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -45,24 +46,22 @@ export default class Game {
     }
     createWalls() {
         const tableSidesData = this.tableData["table-sides"];
-        const sideColor = "#117038";
         const SQRT2 = Math.sqrt(2);
         tableSidesData.map((side) => {
             const vertices = [];
             side.map((vertex) => {
                 vertices.push(new Vector2(eval(String(vertex.x)), eval(String(vertex.y))));
             });
-            const sidePolygon = new Polygon(sideColor, true, G.CTX, ...vertices);
+            const sidePolygon = new Polygon(G.TABLE_SIDE_COLOR, true, G.CTX, ...vertices);
             this.walls.push(sidePolygon);
         });
     }
     createHoles() {
         const tableHoleData = this.tableData["holes"];
-        const holeColor = "#141414";
         const SQRT2 = Math.sqrt(2);
         tableHoleData.map((holeCenter) => {
             const center = new Vector2(eval(String(holeCenter.x)), eval(String(holeCenter.y)));
-            const holeCircle = new Circle(holeColor, false, G.CTX, center, G.HOLE_RADIUS);
+            const holeCircle = new Circle(G.HOLE_COLOR, false, G.CTX, center, G.HOLE_RADIUS);
             this.holes.push(holeCircle);
         });
     }
@@ -95,22 +94,29 @@ export default class Game {
         }
     }
     createTableBorders() {
-        const tableBorderColor = "#8f5d1b";
-        this.tableBorders.push(new Polygon(tableBorderColor, false, G.CTX, new Vector2(0, 0), new Vector2(G.TABLE_WIDTH, 0), new Vector2(G.TABLE_WIDTH, G.TABLE_BORDER_WIDTH), new Vector2(0, G.TABLE_BORDER_WIDTH)));
-        this.tableBorders.push(new Polygon(tableBorderColor, false, G.CTX, new Vector2(0, 0), new Vector2(G.TABLE_BORDER_WIDTH, 0), new Vector2(G.TABLE_BORDER_WIDTH, G.TABLE_HEIGHT), new Vector2(0, G.TABLE_HEIGHT)));
-        this.tableBorders.push(new Polygon(tableBorderColor, false, G.CTX, new Vector2(0, G.TABLE_HEIGHT - G.TABLE_BORDER_WIDTH), new Vector2(G.TABLE_WIDTH, G.TABLE_HEIGHT - G.TABLE_BORDER_WIDTH), new Vector2(G.TABLE_WIDTH, G.TABLE_HEIGHT), new Vector2(0, G.TABLE_HEIGHT)));
-        this.tableBorders.push(new Polygon(tableBorderColor, false, G.CTX, new Vector2(G.TABLE_WIDTH - G.TABLE_BORDER_WIDTH, 0), new Vector2(G.TABLE_WIDTH, 0), new Vector2(G.TABLE_WIDTH, G.TABLE_HEIGHT), new Vector2(G.TABLE_WIDTH - G.TABLE_BORDER_WIDTH, G.TABLE_HEIGHT)));
+        this.tableBorders.push(new Polygon(G.TABLE_BORDER_COLOR, false, G.CTX, new Vector2(0, 0), new Vector2(G.TABLE_WIDTH, 0), new Vector2(G.TABLE_WIDTH, G.TABLE_BORDER_WIDTH), new Vector2(0, G.TABLE_BORDER_WIDTH)));
+        this.tableBorders.push(new Polygon(G.TABLE_BORDER_COLOR, false, G.CTX, new Vector2(0, 0), new Vector2(G.TABLE_BORDER_WIDTH, 0), new Vector2(G.TABLE_BORDER_WIDTH, G.TABLE_HEIGHT), new Vector2(0, G.TABLE_HEIGHT)));
+        this.tableBorders.push(new Polygon(G.TABLE_BORDER_COLOR, false, G.CTX, new Vector2(0, G.TABLE_HEIGHT - G.TABLE_BORDER_WIDTH), new Vector2(G.TABLE_WIDTH, G.TABLE_HEIGHT - G.TABLE_BORDER_WIDTH), new Vector2(G.TABLE_WIDTH, G.TABLE_HEIGHT), new Vector2(0, G.TABLE_HEIGHT)));
+        this.tableBorders.push(new Polygon(G.TABLE_BORDER_COLOR, false, G.CTX, new Vector2(G.TABLE_WIDTH - G.TABLE_BORDER_WIDTH, 0), new Vector2(G.TABLE_WIDTH, 0), new Vector2(G.TABLE_WIDTH, G.TABLE_HEIGHT), new Vector2(G.TABLE_WIDTH - G.TABLE_BORDER_WIDTH, G.TABLE_HEIGHT)));
     }
     createCanvases() {
         const tableCanvas = document.createElement('canvas');
         const dpr = window.devicePixelRatio || 1;
-        tableCanvas.width = G.TABLE_WIDTH * dpr;
-        tableCanvas.height = G.TABLE_HEIGHT * dpr;
-        tableCanvas.style.width = "100%";
-        tableCanvas.style.height = "100%";
+        tableCanvas.width = G.TABLE_WIDTH * 2 * dpr;
+        tableCanvas.height = G.TABLE_HEIGHT * 2 * dpr;
         G.CTX = tableCanvas.getContext('2d');
         G.CTX.setTransform(dpr, 0, 0, dpr, 0, 0);
         this.mainContainer.appendChild(tableCanvas);
+    }
+    repositionContainer() {
+        const repostion = () => {
+            const containerWidth = this.mainContainer.clientWidth;
+            const containerHeight = this.mainContainer.clientHeight;
+            this.mainContainer.style.top = `calc(50vh - ${containerHeight / 2}px)`;
+            this.mainContainer.style.left = `calc(50vw - ${containerWidth / 2}px)`;
+        };
+        repostion();
+        window.addEventListener('resize', repostion);
     }
     updateGame() {
         this.movementManager.moveBallsAccordingly();

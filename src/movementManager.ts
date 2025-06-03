@@ -25,13 +25,13 @@ export default class MovementManager{
             let clickPos;
             if(Utils.isOrientationPortrait()){
                 const canvasPos = canvas.getBoundingClientRect();
-                const clickX = Math.round((canvasPos.bottom - e.pageY) * G.TABLE_WIDTH / canvasPos.height);
-                const clickY = Math.round((e.pageX - canvasPos.left) * G.TABLE_HEIGHT / canvasPos.width);
+                const clickX = Math.round((canvasPos.bottom - e.pageY) * G.CANVAS_WIDTH / canvasPos.height) - (G.TABLE_WIDTH / 2);
+                const clickY = Math.round((e.pageX - canvasPos.left) * G.CANVAS_HEIGHT / canvasPos.width) - (G.TABLE_HEIGHT / 2);
                 clickPos = new Vector2(clickX, clickY);
             }else{
                 const canvasPos = canvas.getBoundingClientRect();
-                const clickX = Math.round((e.pageX - canvasPos.left) * G.TABLE_HEIGHT / canvasPos.height);
-                const clickY = Math.round((e.pageY - canvasPos.top) * G.TABLE_WIDTH / canvasPos.width);
+                const clickX = Math.round((e.pageX - canvasPos.left) * G.CANVAS_HEIGHT / canvasPos.height) - (G.TABLE_WIDTH / 2);
+                const clickY = Math.round((e.pageY - canvasPos.top) * G.CANVAS_WIDTH / canvasPos.width) - (G.TABLE_HEIGHT / 2);
                 clickPos = new Vector2(clickX, clickY);
             }
 
@@ -44,7 +44,6 @@ export default class MovementManager{
             this.whiteBall.velocity = new Vector2(0, 0);
         })
     }
-
 
     moveBallsAccordingly(){
         for(let i=0; i < this.game.balls.length ; i++){

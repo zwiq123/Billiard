@@ -1,3 +1,4 @@
+import { Globals as G } from "./Globals.js";
 export class Circle {
     constructor(color, collisions = true, ctx, centerPos, radius, { velocity = new Vector2(0, 0) } = {}) {
         this.center = centerPos;
@@ -10,7 +11,7 @@ export class Circle {
     draw() {
         this.ctx.fillStyle = this.color;
         this.ctx.beginPath();
-        this.ctx.arc(this.center.x, this.center.y, this.radius, 0, 2 * Math.PI);
+        this.ctx.arc(this.center.x + G.OFFSET_X, this.center.y + G.OFFSET_Y, this.radius, 0, 2 * Math.PI);
         this.ctx.fill();
         this.ctx.closePath();
     }
@@ -28,10 +29,10 @@ export class Polygon {
     draw() {
         this.ctx.fillStyle = this.color;
         this.ctx.beginPath();
-        this.ctx.moveTo(this.vertices[0].x, this.vertices[0].y);
+        this.ctx.moveTo(this.vertices[0].x + G.OFFSET_X, this.vertices[0].y + G.OFFSET_Y);
         for (let i = 1; i < this.vertices.length; i++) {
             const vertex = this.vertices[i];
-            this.ctx.lineTo(vertex.x, vertex.y);
+            this.ctx.lineTo(vertex.x + G.OFFSET_X, vertex.y + G.OFFSET_Y);
         }
         this.ctx.fill();
     }
@@ -45,16 +46,18 @@ export class Segment {
     length() {
         return Vector2.subtract(this.end, this.start).length();
     }
-    draw(color, width, lineDash = []) {
+    draw(color, width, { lineCap = "butt", lineDash = [] } = {}) {
         this.ctx.setLineDash(lineDash);
         this.ctx.strokeStyle = color;
         this.ctx.lineWidth = width;
+        this.ctx.lineCap = lineCap;
         this.ctx.beginPath();
-        this.ctx.moveTo(this.start.x, this.start.y);
-        this.ctx.lineTo(this.end.x, this.end.y);
+        this.ctx.moveTo(this.start.x + G.OFFSET_X, this.start.y + G.OFFSET_Y);
+        this.ctx.lineTo(this.end.x + G.OFFSET_X, this.end.y + G.OFFSET_Y);
         this.ctx.stroke();
         this.ctx.closePath();
         this.ctx.setLineDash([]);
+        this.ctx.lineCap = "butt";
     }
 }
 export class Vector2 {

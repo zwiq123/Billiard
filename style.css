@@ -6,27 +6,34 @@
 
 body{
     height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, rgb(90, 131, 255), rgb(0, 198, 238))
+    width: 100vw;
+    background: linear-gradient(135deg, rgb(90, 131, 255), rgb(0, 198, 238));
+    overflow: hidden;
 }
 
 canvas{
     border: 1px solid black;
+    width: 100%;
+    height: 100%;
 }
 
 #mainContainer{
-    width: 90vmax;
-    height: 45vmax;
-    min-width: 600px;
-    min-height: 300px;
-}    
+    position: absolute;
+    min-width: 1200px;
+        min-height: 600px;
+}
+
+@media only screen and (orientation: landscape){
+    #mainContainer{
+        width: 120vw;
+        height: 60vw;
+    }
+}
 
 @media only screen and (orientation: portrait){
     #mainContainer{
-        width: 80vmin;
-        height: 40vmin;
+        width: 140vh;
+        height: 70vh;
         transform: rotate(-90deg);
     }
 }
