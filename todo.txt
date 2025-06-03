@@ -2,9 +2,12 @@
 [x] fix ball collisions
 [x] fix high-speed ball-wall collisions (implement swept collision detection)
 [x] revamp collisions to remove Complex Numbers
-[ ] move collisions
+[x] move collisions
 
-[ ] add a GLOBALS.json file
+[x] add a Globals.ts file
+
+[x] make the text on balls actually centered
+[x?] make balls spin
 
 [ ] add the stick and make it function properly
 [ ] add players
@@ -18,3 +21,25 @@
 [ ] add the black ball finish (+ research)
 [ ] add menu
 [ ] add bot
+
+
+Game:
+ - start
+ - end
+ - loop
+
+Visual:
+ - drawing
+
+Collision:
+ - collisions
+
+Movement:
+ - Movement
+ - collision calls
+ - ball in holes
+ - stick
+
+Player:
+ - turns
+ - points
