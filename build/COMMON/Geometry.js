@@ -1,18 +1,27 @@
 import { Globals as G } from "./Globals.js";
 export class Circle {
-    constructor(color, collisions = true, ctx, centerPos, radius, { velocity = new Vector2(0, 0) } = {}) {
+    constructor(color, collisions = true, ctx, centerPos, radius, { velocity = new Vector2(0, 0), isHollow = false, borderWidth = 2 } = {}) {
         this.center = centerPos;
         this.velocity = velocity;
         this.radius = radius;
         this.collisions = collisions;
         this.color = color;
         this.ctx = ctx;
+        this.isHollow = isHollow;
+        this.borderWidth = borderWidth;
     }
     draw() {
-        this.ctx.fillStyle = this.color;
         this.ctx.beginPath();
         this.ctx.arc(this.center.x + G.OFFSET_X, this.center.y + G.OFFSET_Y, this.radius, 0, 2 * Math.PI);
-        this.ctx.fill();
+        if (this.isHollow) {
+            this.ctx.strokeStyle = this.color;
+            this.ctx.lineWidth = this.borderWidth;
+            this.ctx.stroke();
+        }
+        else {
+            this.ctx.fillStyle = this.color;
+            this.ctx.fill();
+        }
         this.ctx.closePath();
     }
 }
@@ -79,6 +88,9 @@ export class Vector2 {
     }
     static dot(a, b) {
         return a.x * b.x + a.y * b.y;
+    }
+    static cross(a, b) {
+        return a.x * b.y - a.y * b.x;
     }
     static reflect(v, n) {
         //V′ = V − 2 * (V ⋅ N) * N

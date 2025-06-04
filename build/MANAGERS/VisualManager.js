@@ -1,6 +1,5 @@
-import { Globals as G } from "./Globals.js";
-import { Circle, Polygon, Vector2 } from "./Geometry.js";
-import Cue from "./Cue.js";
+import { Globals as G } from "../COMMON/Globals.js";
+import { Polygon, Vector2 } from "../COMMON/Geometry.js";
 export default class VisualManager {
     constructor(game) {
         this.game = game;
@@ -12,9 +11,6 @@ export default class VisualManager {
         this.drawTableBorders();
         this.drawTableSides();
         this.drawHoles();
-        const point = new Circle("red", false, G.CTX, new Vector2(720, 360), 5);
-        Cue.draw(this.game.balls[0], new Vector2(720, 360));
-        point.draw();
     }
     drawTableSides() {
         for (const wall of this.game.walls) {

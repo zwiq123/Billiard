@@ -24,28 +24,29 @@ export class Globals{
     static readonly TABLE_SIDE_COLOR: string = "#117038";
     static readonly HOLE_COLOR: string = "#141414";
 
-    //-----CUE-----
+    //-----CUE DRAWING-----
     static readonly CUE_LENGTH: number = 400;
     static readonly CUE_DISTANCE_FROM_BALL: number = 15;
+    static readonly CUE_TIP_OVERLAP: number = 2;
 
     static readonly CUE_SEGMENTS_WIDTH: number[] = [
-        11,
+        10,
         11,
         10,
         9,
         9,
-        8,
-        8
+        9,
+        9
     ];
 
     static readonly CUE_SEGMENTS_LENGTH_RATIO: number[] = [
-        15 / 1300,
+        1 / 1300,
         200 / 1300,
         405 / 1300,
         20 / 1300,
-        620 / 1300,
-        30 / 1300,
-        10 / 1300
+        600 / 1300,
+        60 / 1300,
+        14 / 1300
     ];
 
     static readonly CUE_SEGMENTS_COLOR: string[] = [
@@ -57,4 +58,26 @@ export class Globals{
         "white",
         "black"
     ];
+
+    // static readonly CUE_SEGMENTS_COLOR: string[] = [
+    //     "crimson",
+    //     "black",
+    //     "crimson",
+    //     "black",
+    //     "crimson",
+    //     "white",
+    //     "black"
+    // ];
+
+    //-----HIT PROJECTION-----
+    static readonly HIT_PROJECTION_WIDTH: number = 2;
+    static readonly HIT_PROJECTION_COLOR: string = "white";
+    static readonly HIT_PROJECTION_DASH: number[] = [10, 10];
+    static readonly HIT_DIRECTION_LINES_TOTAL_LENGTH: number = 125;
+
+    //-----HITTING-----
+    static readonly MAX_POWER: number = 50;
+    static readonly PULL_DISTANCE_TO_POWER_FACTOR: number = 0.2;
+    static readonly CUE_PULL_DISTANCE_FACTOR: number = 1.5;
+    static readonly POWER_RELEASE_FACTOR: number = 0.3;
 }

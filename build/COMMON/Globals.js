@@ -21,26 +21,27 @@ Globals.TABLE_BORDER_COLOR = "#8f5d1b";
 Globals.TABLE_MAIN_COLOR = "#169149";
 Globals.TABLE_SIDE_COLOR = "#117038";
 Globals.HOLE_COLOR = "#141414";
-//-----CUE-----
+//-----CUE DRAWING-----
 Globals.CUE_LENGTH = 400;
 Globals.CUE_DISTANCE_FROM_BALL = 15;
+Globals.CUE_TIP_OVERLAP = 2;
 Globals.CUE_SEGMENTS_WIDTH = [
-    11,
+    10,
     11,
     10,
     9,
     9,
-    8,
-    8
+    9,
+    9
 ];
 Globals.CUE_SEGMENTS_LENGTH_RATIO = [
-    15 / 1300,
+    1 / 1300,
     200 / 1300,
     405 / 1300,
     20 / 1300,
-    620 / 1300,
-    30 / 1300,
-    10 / 1300
+    600 / 1300,
+    60 / 1300,
+    14 / 1300
 ];
 Globals.CUE_SEGMENTS_COLOR = [
     "#f0cd81",
@@ -51,3 +52,22 @@ Globals.CUE_SEGMENTS_COLOR = [
     "white",
     "black"
 ];
+// static readonly CUE_SEGMENTS_COLOR: string[] = [
+//     "crimson",
+//     "black",
+//     "crimson",
+//     "black",
+//     "crimson",
+//     "white",
+//     "black"
+// ];
+//-----HIT PROJECTION-----
+Globals.HIT_PROJECTION_WIDTH = 2;
+Globals.HIT_PROJECTION_COLOR = "white";
+Globals.HIT_PROJECTION_DASH = [10, 10];
+Globals.HIT_DIRECTION_LINES_TOTAL_LENGTH = 125;
+//-----HITTING-----
+Globals.MAX_POWER = 50;
+Globals.PULL_DISTANCE_TO_POWER_FACTOR = 0.2;
+Globals.CUE_PULL_DISTANCE_FACTOR = 1.5;
+Globals.POWER_RELEASE_FACTOR = 0.3;

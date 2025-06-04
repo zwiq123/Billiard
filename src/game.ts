@@ -1,10 +1,11 @@
-import { Globals as G } from "./Globals.js";
-import { Polygon, Circle, Vector2 } from "./Geometry.js";
-import { Ball } from "./Ball.js";
-import Utils from "./Utils.js";
-import VisualManager from "./VisualManager.js";
-import MovementManager from './MovementManager.js'
-import CollisionManager from "./CollisionManager.js";
+import { Globals as G } from "./COMMON/Globals.js";
+import { Polygon, Circle, Vector2 } from "./COMMON/Geometry.js";
+import { Ball } from "./COMMON/Ball.js";
+import Utils from "./COMMON/Utils.js";
+import VisualManager from "./MANAGERS/VisualManager.js";
+import MovementManager from './MANAGERS/MovementManager.js'
+import CollisionManager from "./MANAGERS/CollisionManager.js";
+import CueManager from "./MANAGERS/CueManager.js";
 
 
 export default class Game{
@@ -15,9 +16,11 @@ export default class Game{
 
     public mainContainer: HTMLDivElement;
     public tableData: any;
+
     public visualManager: VisualManager;
     public movementManager: MovementManager;
     public collisionManager: CollisionManager;
+    public cueManager: CueManager;
 
     private previousFrameTime: number = 0;
     private currentFrameTime: number = 0;
@@ -43,6 +46,7 @@ export default class Game{
         this.createHoles();
         this.movementManager = new MovementManager(this);
         this.collisionManager = new CollisionManager(this);
+        this.cueManager = new CueManager(this.balls[0], this.mainContainer.querySelector('canvas')!, this);
     }
 
     fetchTableSizes(){
@@ -147,6 +151,11 @@ export default class Game{
         this.movementManager.moveBallsAccordingly();
         this.visualManager.drawTable();
         this.visualManager.drawBalls();
+        if(Utils.areBallsStill(this.balls)){
+            this.cueManager.releaseIfPullFinished();
+            this.cueManager.drawCueAndProjection();
+        }
+        
         this.previousFrameTime = this.currentFrameTime || performance.now();
         this.currentFrameTime = performance.now();
         this.frameTime = (this.currentFrameTime - this.previousFrameTime) / 1000;

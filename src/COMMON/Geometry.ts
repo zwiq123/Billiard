@@ -6,22 +6,32 @@ export class Circle{
     public radius: number;
     public color: string;
     public collisions: boolean;
+    public isHollow: boolean;
+    public borderWidth: number;
     public ctx: CanvasRenderingContext2D;
 
-    constructor(color: string, collisions = true, ctx: CanvasRenderingContext2D, centerPos: Vector2, radius: number, {velocity = new Vector2(0, 0)} = {}){
+    constructor(color: string, collisions = true, ctx: CanvasRenderingContext2D, centerPos: Vector2, radius: number, {velocity = new Vector2(0, 0), isHollow = false, borderWidth = 2} = {}){
         this.center = centerPos;
         this.velocity = velocity;
         this.radius = radius;
         this.collisions = collisions;
         this.color = color;
         this.ctx = ctx;
+        this.isHollow = isHollow;
+        this.borderWidth = borderWidth;
     }
 
     public draw(){
-        this.ctx.fillStyle = this.color;
         this.ctx.beginPath();
         this.ctx.arc(this.center.x + G.OFFSET_X, this.center.y + G.OFFSET_Y, this.radius, 0, 2*Math.PI);
-        this.ctx.fill();
+        if(this.isHollow){
+            this.ctx.strokeStyle = this.color;
+            this.ctx.lineWidth = this.borderWidth;
+            this.ctx.stroke();
+        }else{
+            this.ctx.fillStyle = this.color;
+            this.ctx.fill();
+        }
         this.ctx.closePath();
     }
 }
@@ -69,7 +79,7 @@ export class Segment{
         return Vector2.subtract(this.end, this.start).length();
     }
 
-    public draw(color: string, width: number, {lineCap = "butt" as CanvasLineCap, lineDash = []} = {}){
+    public draw(color: string, width: number, {lineCap = "butt" as CanvasLineCap, lineDash = []}: {lineCap?: CanvasLineCap, lineDash?: number[]} = {}){
         this.ctx.setLineDash(lineDash);
         this.ctx.strokeStyle = color;
         this.ctx.lineWidth = width;
@@ -112,6 +122,10 @@ export class Vector2{
 
     static dot(a: Vector2, b: Vector2): number{
         return a.x*b.x + a.y*b.y;
+    }
+
+    static cross(a: Vector2, b: Vector2): number{
+        return a.x*b.y - a.y*b.x;
     }
 
     static reflect(v: Vector2, n: Vector2): Vector2{

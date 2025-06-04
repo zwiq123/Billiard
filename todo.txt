@@ -10,24 +10,27 @@
 [x?] make balls spin
 
 [x] add the stick
-[ ] determine when it's time to use the stick
-[ ] make the stick appear only when it's time
-[ ] make the stick follow the player's cursor
-[ ] make the player's cursor the ball outline
-[ ] draw the trajectory
-[ ] make tooltips
-[ ] make the stick lock/unlock + tooltips
-[ ] add stick power
-[ ] add stick animation
+[x] determine when it's time to use the stick
+[x] make the stick appear only when it's time
+[x] make the stick follow the player's cursor
+[x] draw the ball projection
+[x] draw the trajectory
+[x] add the stick power by pulling
+[x?] add stick animation
+
+[ ] fix ball-ball collision
 
 [ ] add players
 [ ] add PlayerManager (player "banks" + research (names))
 [ ] make balls go to player pockets after going into holes + white ball reappear
 [ ] add ball disposal animations
 [ ] add the white ball placement functions (+ research)
+[ ] make ball starting positions random
 
 [ ] make players have turns
 [ ] add players ui
+[ ] add the black ball loss
 [ ] add the black ball finish (+ research)
 [ ] add menu
+[ ] make tooltips
 [ ] add bot

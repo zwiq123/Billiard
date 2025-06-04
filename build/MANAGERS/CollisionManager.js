@@ -1,4 +1,4 @@
-import { Vector2 } from './Geometry.js';
+import { Vector2 } from '../COMMON/Geometry.js';
 export default class CollisionManager {
     constructor(game) {
         this.game = game;
@@ -148,5 +148,103 @@ export default class CollisionManager {
         const pt1 = Vector2.add(start1, Vector2.multiplyByNum(seg1, closestPointOnSeg1Ratio));
         const pt2 = Vector2.add(start2, Vector2.multiplyByNum(seg2, closestPointOnSeg2Ratio));
         return Vector2.subtract(pt1, pt2).length();
+    }
+    //-----RAY-CASTING (CUE)-----
+    static getFirstCollisionPoint(cursorPos, whiteBall, balls, walls, holes) {
+        const direction = Vector2.subtract(cursorPos, whiteBall.center).normalized();
+        let closestPoint = null;
+        let minDist = Infinity;
+        let ballHit = null;
+        for (const ball of balls) {
+            if (ball === whiteBall)
+                continue;
+            const hit = CollisionManager.rayBallIntersection(whiteBall, ball, direction);
+            if (hit && hit.distance < minDist) {
+                minDist = hit.distance;
+                closestPoint = hit.point;
+                ballHit = ball;
+            }
+        }
+        for (const wall of walls) {
+            for (let i = 0; i < wall.vertices.length; i++) {
+                const start = wall.vertices[i];
+                const end = wall.vertices[(i + 1) % wall.vertices.length];
+                const hit = CollisionManager.rayWallIntersection(whiteBall, direction, start, end);
+                if (hit && hit.distance < minDist) {
+                    minDist = hit.distance;
+                    closestPoint = hit.point;
+                    ballHit = null;
+                }
+            }
+        }
+        for (const hole of holes) {
+            const hit = CollisionManager.rayHoleIntersection(whiteBall, hole, direction);
+            if (hit && hit.distance < minDist) {
+                minDist = hit.distance;
+                closestPoint = hit.point;
+                ballHit = null;
+            }
+        }
+        return closestPoint ? { closestPoint: closestPoint, ballHit: ballHit } : { closestPoint: cursorPos, ballHit: null };
+    }
+    static rayHoleIntersection(whiteBall, ball, dir) {
+        // Ray: origin + t*dir
+        // Collision: |(origin + t*dir) - targetBall.center| = whiteBall.radius + targetBall.radius
+        const origin = whiteBall.center;
+        const center = ball.center;
+        const sumRadii = whiteBall.radius + ball.radius;
+        const oc = Vector2.subtract(origin, center);
+        const a = Vector2.dot(dir, dir);
+        const b = 2 * Vector2.dot(oc, dir);
+        const c = Vector2.dot(oc, oc) - sumRadii * sumRadii;
+        const discriminant = b * b - 4 * a * c;
+        if (discriminant < 0)
+            return null;
+        const sqrtDisc = Math.sqrt(discriminant);
+        const t = (-b - sqrtDisc) / (2 * a);
+        if (t < 0)
+            return null;
+        const whiteAtCollision = Vector2.add(origin, Vector2.multiplyByNum(dir, t));
+        const contactDir = Vector2.subtract(whiteAtCollision, center).normalized();
+        const contactPoint = Vector2.add(center, Vector2.multiplyByNum(contactDir, ball.radius));
+        return { point: contactPoint, distance: t };
+    }
+    static rayBallIntersection(whiteBall, ball, dir) {
+        const origin = whiteBall.center;
+        const center = ball.center;
+        const radius = ball.radius + whiteBall.radius;
+        const oc = Vector2.subtract(origin, center);
+        const a = Vector2.dot(dir, dir);
+        const b = 2 * Vector2.dot(oc, dir);
+        const c = Vector2.dot(oc, oc) - (radius ** 2);
+        const discriminant = b * b - 4 * a * c;
+        if (discriminant < 0)
+            return null;
+        const t = (-b - Math.sqrt(discriminant)) / (2 * a);
+        if (t < 0)
+            return null;
+        return { point: Vector2.add(origin, Vector2.multiplyByNum(dir, t)), distance: t };
+    }
+    static rayWallIntersection(whiteBall, dir, segA, segB) {
+        // Ray: origin + t*dir, Segment: segA + u*(segB-segA), 0<=u<=1
+        const origin = whiteBall.center;
+        const v1 = Vector2.subtract(origin, segA);
+        const v2 = Vector2.subtract(segB, segA);
+        const v3 = new Vector2(-dir.y, dir.x);
+        const dot = Vector2.dot(v2, v3);
+        if (Math.abs(dot) < 1e-6)
+            return null; // can't put === 0 bc float
+        const t = Vector2.cross(v2, v1) / dot;
+        const u = Vector2.dot(v1, v3) / dot;
+        let wallNormal = Vector2.getWallNormal(segA, segB);
+        if (Vector2.dot(wallNormal, dir) > 0) {
+            wallNormal = Vector2.multiplyByNum(wallNormal, -1);
+        }
+        const hitPoint = Vector2.add(origin, Vector2.multiplyByNum(dir, t));
+        const hitPointOffset = Vector2.add(hitPoint, Vector2.multiplyByNum(wallNormal, whiteBall.radius));
+        if (t >= 0 && u >= 0 && u <= 1) {
+            return { point: hitPointOffset, distance: t };
+        }
+        return null;
     }
 }
