@@ -1,4 +1,5 @@
 import { Globals as G } from "../COMMON/Globals.js";
+import { ElementsHTML as HTML } from "../COMMON/ElementsHTML.js";
 import { Circle, Segment, Vector2 } from "../COMMON/Geometry.js";
 import { Ball } from "../COMMON/Ball.js";
 import Game from "../Game.js";
@@ -8,7 +9,6 @@ import CollisionManager from "./CollisionManager.js";
 
 export default class CueManager{
     private game: Game
-    private canvas: HTMLCanvasElement;
     private whiteBall: Ball;
 
     private cursorPos: Vector2 = new Vector2(G.TABLE_WIDTH / 2, G.TABLE_HEIGHT / 2);
@@ -19,37 +19,40 @@ export default class CueManager{
     private power: number = 0;
     private truePower: number = 0;
 
-    constructor(whiteBall: Ball, canvas: HTMLCanvasElement, game: Game){
+    constructor(game: Game){
         this.game = game;
-        this.whiteBall = whiteBall;
-        this.canvas = canvas;
+        this.whiteBall = this.game.balls[0];
         this.detectTouch();
         this.detectCursorMove();
     }
 
     private detectCursorMove(){
-        this.canvas.addEventListener("mousemove", (e) => {
+        HTML.tableCanvas.addEventListener("mousemove", (e) => {
             if(this.isPulling){
-                const pullDistance = this.getPullDistance(Utils.getCursorPosition(this.canvas, e));
+                const pullDistance = this.getPullDistance(Utils.getCursorPosition(HTML.tableCanvas, e));
                 const power = Math.max(pullDistance, 0) * G.PULL_DISTANCE_TO_POWER_FACTOR;
                 this.power = Math.min(power, G.MAX_POWER);
                 this.truePower = this.power;
             }else{
                 if(this.power > 0) return;
-                this.cursorPos = Utils.getCursorPosition(this.canvas, e);
+                this.cursorPos = Utils.getCursorPosition(HTML.tableCanvas, e);
             }
         });
     }
 
+    public updateWhiteBall(){
+        this.whiteBall = this.game.balls[0];
+    }
+
     private detectTouch(){
-        this.canvas.addEventListener("mousedown", (e) => {
+        HTML.tableCanvas.addEventListener("mousedown", (e) => {
             this.isPulling = true;
-            this.touchPos = Utils.getCursorPosition(this.canvas, e);
+            this.touchPos = Utils.getCursorPosition(HTML.tableCanvas, e);
         });
 
-        this.canvas.addEventListener("mouseup", (e) => {
+        HTML.tableCanvas.addEventListener("mouseup", (e) => {
             this.isPulling = false;
-            this.releasePos = Utils.getCursorPosition(this.canvas, e);
+            this.releasePos = Utils.getCursorPosition(HTML.tableCanvas, e);
         });
     }
 
@@ -120,6 +123,10 @@ export default class CueManager{
     public drawCue(){
         const directionVector = Vector2.subtract(this.cursorPos, this.whiteBall.center);
         const normalizedDirection = Vector2.multiplyByNum(directionVector.normalized(), -1);
+
+        if(directionVector.length() === 0){
+            return;
+        }
 
         let currentDistance = this.whiteBall.radius + G.CUE_DISTANCE_FROM_BALL + this.power * G.CUE_PULL_DISTANCE_FACTOR;
         if(!this.isPulling && this.truePower > 0){

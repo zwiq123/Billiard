@@ -7,8 +7,8 @@ export class Ball extends Circle{
     public number: number;
     public side: string | null;
     public angle: number;
-    constructor(ctx: CanvasRenderingContext2D, centerPos: Vector2, radius: number, {collisions = true, number = 0, velocity = new Vector2(0, 0), angle = Utils.degreesToRadians(90)} = {}){
-        super(Ball.getColorByNumber(number), collisions, ctx, centerPos, radius, {velocity: velocity});
+    constructor(ctx: CanvasRenderingContext2D, centerPos: Vector2, {collisions = true, number = 0, velocity = new Vector2(0, 0), angle = Utils.degreesToRadians(90)} = {}){
+        super(Ball.getColorByNumber(number), collisions, ctx, centerPos, G.BALL_RADIUS, {velocity: velocity});
         this.side = Ball.getSideByNumber(number);
         this.number = number;
         this.angle = angle;

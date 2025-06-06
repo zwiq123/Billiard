@@ -1,6 +1,7 @@
 import { Circle, Vector2, Polygon } from '../COMMON/Geometry.js';
 import { Ball } from '../COMMON/Ball.js';
 import Game from '../Game.js';
+import Utils from '../COMMON/Utils.js';
 
 
 export default class CollisionManager{
@@ -12,25 +13,32 @@ export default class CollisionManager{
 
     //-----RESOLVING COLLISIONS-----
 
-    resolveBallCollisionsWithOtherBalls(){
+    //only to help with start of the game where all balls are touching each other
+    public resolveBallCollisionsWithOtherBalls(){
         for(let j = 0 ; j < this.game.balls.length ; j++){
             for(let k = j + 1 ; k < this.game.balls.length ; k++){
                 const ballA = this.game.balls[j];
                 const ballB = this.game.balls[k];
 
-                if(CollisionManager.areBallsTouching(ballA, ballB)){
+                if(Utils.areBallsTouching(ballA, ballB)){
                     CollisionManager.reflectBalls(ballA, ballB);
                 }
             }
         }
     }
 
-    resolveBallCollisionsWithWalls(ball: Circle): void {
+    public resolveCollisions(ball: Circle) {
         const steps = 4;
-        const subVelocity = Vector2.multiplyByNum(ball.velocity,  1 / steps);
+        const subVelocity = Vector2.multiplyByNum(ball.velocity, 1 / steps);
 
         for (let step = 0; step < steps; step++) {
             let hit = false;
+            let ballCenterAtCollisionWithWall: Vector2 | null = null;
+            let wallNormal: Vector2 | null = null;
+            let ballCenterAtCollisionWithBall: Vector2 | null = null;
+            let hitBall: Circle | null = null;
+
+            // walls
             for (const wall of this.game.walls) {
                 for (let i = 0; i < wall.vertices.length; i++) {
                     const wallStart = wall.vertices[i];
@@ -39,37 +47,62 @@ export default class CollisionManager{
                     const ballPathEnd = Vector2.add(ball.center, subVelocity);
 
                     if (CollisionManager.distanceSegmentToSegment(ballPathStart, ballPathEnd, wallStart, wallEnd) <= ball.radius) {
-                        const ballCenterAtCollision = CollisionManager.findCollisionPoint(ballPathStart, ballPathEnd, wallStart, wallEnd, ball.radius);
-                        if (ballCenterAtCollision === null) continue;
-                        ball.center = ballCenterAtCollision;
-                        const wallNormal = Vector2.getWallNormal(wallStart, wallEnd);
-                        CollisionManager.reflectBallOffWall(ball, wallNormal);
+                        ballCenterAtCollisionWithWall = CollisionManager.findBallWallCollisionPoint(ballPathStart, ballPathEnd, wallStart, wallEnd, ball.radius);
+                        if (!ballCenterAtCollisionWithWall) continue;
+                        wallNormal = Vector2.getWallNormal(wallStart, wallEnd);
                         hit = true;
                         break;
                     }
                 }
                 if (hit) break;
             }
+
+            // balls
+            for (const otherBall of this.game.balls) {
+                if (otherBall === ball) continue;
+
+                if (CollisionManager.getBallCollisionTime(ball, otherBall)) {
+                    const collision = CollisionManager.rayBallIntersection(ball, otherBall, subVelocity.normalized());
+                    if (!collision) continue;
+                    ballCenterAtCollisionWithBall = collision.point;
+                    hitBall = otherBall;
+                    hit = true;
+                    break;
+                }
+            }
+
             if (!hit) {
                 ball.center = Vector2.add(ball.center, subVelocity);
-            } else {
-                break;
+                continue;
             }
+
+            let ballFirst = false;
+
+            if (ballCenterAtCollisionWithBall && ballCenterAtCollisionWithWall) {
+                if (Vector2.subtract(ballCenterAtCollisionWithBall, ball.center).length() < Vector2.subtract(ballCenterAtCollisionWithWall, ball.center).length()) {
+                    ballFirst = true;
+                }
+            } else if (ballCenterAtCollisionWithBall) ballFirst = true;
+
+            if (ballFirst) {
+                ball.center = ballCenterAtCollisionWithBall!;
+                CollisionManager.reflectBalls(ball, hitBall!);
+            } else {
+                ball.center = ballCenterAtCollisionWithWall!;
+                CollisionManager.reflectBallOffWall(ball, wallNormal!);
+            }
+
+            break;
         }
     }
 
     //-----REFLECTING BALLS-----
 
-    static reflectBallOffWall(ball: Circle, normal: Vector2): void{
+    private static reflectBallOffWall(ball: Circle, normal: Vector2): void{
         ball.velocity = Vector2.reflect(ball.velocity, normal);
     }
 
-    static areBallsTouching(ballA: Circle, ballB: Circle): boolean{
-        return Vector2.subtract(ballA.center, ballB.center).length() <= ballA.radius + ballB.radius;
-    }
-
-    static reflectBalls(ballA: Circle, ballB: Circle): void{
-
+    private static reflectBalls(ballA: Circle, ballB: Circle): void{
         const normal = Vector2.subtract(ballA.center, ballB.center).normalized();
         const relativeVelocity = Vector2.subtract(ballA.velocity, ballB.velocity);
         const velocityAlongNormal = Vector2.dot(relativeVelocity, normal);
@@ -84,10 +117,11 @@ export default class CollisionManager{
         ballA.velocity = Vector2.add(ballA.velocity, impulse);
         ballB.velocity = Vector2.subtract(ballB.velocity, impulse);
 
+        //for more "splash" 
         const distance = Vector2.subtract(ballA.center, ballB.center).length();
         const overlap = ballA.radius + ballB.radius - distance;
         if (overlap > 0) {
-            const correction = Vector2.multiplyByNum(normal, overlap / 2 + 0.01); // Adding a small value to prevent sticking
+            const correction = Vector2.multiplyByNum(normal, overlap / 2 + 0.001);
             ballA.center = Vector2.add(ballA.center, correction);
             ballB.center = Vector2.subtract(ballB.center, correction);
         }
@@ -95,7 +129,7 @@ export default class CollisionManager{
 
     //-----HELPERS-----
 
-    static findCollisionPoint(
+    private static findBallWallCollisionPoint(
         start: Vector2,
         end: Vector2,
         wallStart: Vector2,
@@ -124,18 +158,18 @@ export default class CollisionManager{
         return found ? Vector2.add(start, Vector2.multiplyByNum(Vector2.subtract(end, start), tHit!)) : null;
     }
 
-    static closestPointOnSegment(point: Vector2, start: Vector2, end: Vector2): Vector2 {
+    private static closestPointOnSegment(point: Vector2, start: Vector2, end: Vector2): Vector2 {
         const ab = Vector2.subtract(end, start);
         const t = Math.max(0, Math.min(1, Vector2.dot(Vector2.subtract(point, start), ab) / ab.length() ** 2));
         return Vector2.add(start, Vector2.multiplyByNum(ab, t));
     }
 
-    static distancePointToSegment(point: Vector2, start: Vector2, end: Vector2): number {
+    private static distancePointToSegment(point: Vector2, start: Vector2, end: Vector2): number {
         const closest = this.closestPointOnSegment(point, start, end);
         return Vector2.subtract(point, closest).length();
     }
 
-    static distanceSegmentToSegment(start1: Vector2, end1: Vector2, start2: Vector2, end2: Vector2): number {
+    private static distanceSegmentToSegment(start1: Vector2, end1: Vector2, start2: Vector2, end2: Vector2): number {
         const seg1 = Vector2.subtract(end1, start1); // segment 1 as vector (just direction)
         const seg2 = Vector2.subtract(end2, start2); // segment 2 as vector (just direction)
         const betweenStarts = Vector2.subtract(start1, start2); // vector betwwen the start points of the segments
@@ -176,6 +210,29 @@ export default class CollisionManager{
         const pt1 = Vector2.add(start1, Vector2.multiplyByNum(seg1, closestPointOnSeg1Ratio));
         const pt2 = Vector2.add(start2, Vector2.multiplyByNum(seg2, closestPointOnSeg2Ratio));
         return Vector2.subtract(pt1, pt2).length();
+    }
+
+    private static getBallCollisionTime(ballA: Circle, ballB: Circle): number | null {
+        const dp = Vector2.subtract(ballB.center, ballA.center);
+        const dv = Vector2.subtract(ballB.velocity, ballA.velocity);
+        const radii = ballA.radius + ballB.radius;
+
+        const a = Vector2.dot(dv, dv);
+        const b = 2 * Vector2.dot(dp, dv);
+        const c = Vector2.dot(dp, dp) - radii * radii;
+
+        const discriminant = b * b - 4 * a * c;
+        if (a === 0) return null; // Parallel movement
+        if (discriminant < 0) return null;
+
+        const sqrtDisc = Math.sqrt(discriminant);
+        const t1 = (-b - sqrtDisc) / (2 * a);
+        const t2 = (-b + sqrtDisc) / (2 * a);
+
+        // We want the first collision in [0,1]
+        if (t1 >= 0 && t1 <= 1) return t1;
+        if (t2 >= 0 && t2 <= 1) return t2;
+        return null;
     }
 
     //-----RAY-CASTING (CUE)-----
@@ -225,8 +282,6 @@ export default class CollisionManager{
     }
 
     private static rayHoleIntersection(whiteBall: Circle, ball: Circle, dir: Vector2) {
-        // Ray: origin + t*dir
-        // Collision: |(origin + t*dir) - targetBall.center| = whiteBall.radius + targetBall.radius
         const origin = whiteBall.center;
         const center = ball.center;
         const sumRadii = whiteBall.radius + ball.radius;
@@ -240,7 +295,7 @@ export default class CollisionManager{
 
         const sqrtDisc = Math.sqrt(discriminant);
         const t = (-b - sqrtDisc) / (2 * a);
-        if (t < 0) return null;
+        if (t < 0 || Number.isNaN(t)) return null;
 
         const whiteAtCollision = Vector2.add(origin, Vector2.multiplyByNum(dir, t));
         const contactDir = Vector2.subtract(whiteAtCollision, center).normalized();
@@ -249,10 +304,10 @@ export default class CollisionManager{
         return { point: contactPoint, distance: t };
     }
 
-    private static rayBallIntersection(whiteBall: Circle, ball: Circle, dir: Vector2) {
-        const origin = whiteBall.center;
-        const center = ball.center;
-        const radius = ball.radius + whiteBall.radius;
+    private static rayBallIntersection(ballA: Circle, ballB: Circle, dir: Vector2) {
+        const origin = ballA.center;
+        const center = ballB.center;
+        const radius = ballB.radius + ballA.radius;
 
         const oc = Vector2.subtract(origin, center);
         const a = Vector2.dot(dir, dir);
@@ -261,7 +316,7 @@ export default class CollisionManager{
         const discriminant = b * b - 4 * a * c;
         if (discriminant < 0) return null;
         const t = (-b - Math.sqrt(discriminant)) / (2 * a);
-        if (t < 0) return null;
+        if (t < 0 || Number.isNaN(t)) return null;
         return { point: Vector2.add(origin, Vector2.multiplyByNum(dir, t)), distance: t };
     }
 

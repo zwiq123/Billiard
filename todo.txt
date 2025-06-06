@@ -18,16 +18,18 @@
 [x] add the stick power by pulling
 [x?] add stick animation
 
-[ ] fix ball-ball collision
+[ ] fix stick speed
+[x] fix ball-ball collision
 
-[ ] add players
-[ ] add PlayerManager (player "banks" + research (names))
-[ ] make balls go to player pockets after going into holes + white ball reappear
-[ ] add ball disposal animations
-[ ] add the white ball placement functions (+ research)
-[ ] make ball starting positions random
+[x] add players
+[x] add PlayerManager
+[x] make balls go to player pockets after going into holes + white ball reappear
+[x] add ball disposal animations
+[x] add the white ball placement functions   
+[x] make ball starting positions random
 
 [ ] make players have turns
+[ ] check for faults
 [ ] add players ui
 [ ] add the black ball loss
 [ ] add the black ball finish (+ research)

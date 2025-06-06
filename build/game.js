@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Globals as G } from "./COMMON/Globals.js";
+import { ElementsHTML as HTML } from "./COMMON/ElementsHTML.js";
 import { Polygon, Circle, Vector2 } from "./COMMON/Geometry.js";
 import { Ball } from "./COMMON/Ball.js";
 import Utils from "./COMMON/Utils.js";
@@ -15,8 +16,9 @@ import VisualManager from "./MANAGERS/VisualManager.js";
 import MovementManager from './MANAGERS/MovementManager.js';
 import CollisionManager from "./MANAGERS/CollisionManager.js";
 import CueManager from "./MANAGERS/CueManager.js";
+import PlayerManager from "./MANAGERS/PlayerManager.js";
 export default class Game {
-    constructor(containerName) {
+    constructor(containerID) {
         this.previousFrameTime = 0;
         this.currentFrameTime = 0;
         this.frameTime = 0;
@@ -24,7 +26,7 @@ export default class Game {
         this.walls = [];
         this.holes = [];
         this.tableBorders = [];
-        this.mainContainer = document.querySelector('#' + containerName);
+        HTML.getMainContainer(containerID);
         this.createCanvases();
         this.repositionContainer();
     }
@@ -38,7 +40,8 @@ export default class Game {
             this.createHoles();
             this.movementManager = new MovementManager(this);
             this.collisionManager = new CollisionManager(this);
-            this.cueManager = new CueManager(this.balls[0], this.mainContainer.querySelector('canvas'), this);
+            this.playerManager = new PlayerManager(this);
+            this.cueManager = new CueManager(this);
         });
     }
     fetchTableSizes() {
@@ -69,20 +72,14 @@ export default class Game {
         });
     }
     createBalls() {
-        this.balls.push(new Ball(G.CTX, new Vector2(G.TABLE_WIDTH / 4, G.TABLE_HEIGHT / 2), G.BALL_RADIUS));
-        const ballNumbers = [
-            [1],
-            [9, 2],
-            [10, 8, 3],
-            [11, 7, 14, 4],
-            [5, 13, 15, 6, 12]
-        ];
+        this.balls.push(Utils.getNewWhiteBall());
+        const ballPlacement = Utils.getRandomBallStartingPlacement();
         const ballPositions = [];
         ballPositions.push([new Vector2(G.TABLE_WIDTH / 4 * 3, G.TABLE_HEIGHT / 2)]);
-        for (let i = 1; i < ballNumbers.length; i++) {
+        for (let i = 1; i < ballPlacement.length; i++) {
             ballPositions.push([]);
-            for (let j = 0; j < ballNumbers[i].length; j++) {
-                if (j != ballNumbers[i - 1].length) {
+            for (let j = 0; j < ballPlacement[i].length; j++) {
+                if (j != ballPlacement[i - 1].length) {
                     ballPositions[i].push(new Vector2(ballPositions[i - 1][j].x + G.BALL_RADIUS * Math.sqrt(3), ballPositions[i - 1][j].y + G.BALL_RADIUS));
                 }
                 else {
@@ -92,7 +89,7 @@ export default class Game {
         }
         for (let i = 0; i < ballPositions.length; i++) {
             for (let j = 0; j < ballPositions[i].length; j++) {
-                this.balls.push(new Ball(G.CTX, ballPositions[i][j], G.BALL_RADIUS, { number: ballNumbers[i][j] }));
+                this.balls.push(new Ball(G.CTX, ballPositions[i][j], { number: ballPlacement[i][j] }));
             }
         }
     }
@@ -109,14 +106,18 @@ export default class Game {
         tableCanvas.height = G.TABLE_HEIGHT * 2 * dpr;
         G.CTX = tableCanvas.getContext('2d');
         G.CTX.setTransform(dpr, 0, 0, dpr, 0, 0);
-        this.mainContainer.appendChild(tableCanvas);
+        HTML.mainContainer.appendChild(tableCanvas);
+        HTML.getTableCanvas();
     }
     repositionContainer() {
         const repostion = () => {
-            const containerWidth = this.mainContainer.clientWidth;
-            const containerHeight = this.mainContainer.clientHeight;
-            this.mainContainer.style.top = `calc(50vh - ${containerHeight / 2}px)`;
-            this.mainContainer.style.left = `calc(50vw - ${containerWidth / 2}px)`;
+            const containerWidth = HTML.mainContainer.clientWidth;
+            const containerHeight = HTML.mainContainer.clientHeight;
+            HTML.mainContainer.style.top = `calc(50vh - ${containerHeight / 2}px)`;
+            HTML.mainContainer.style.left = `calc(50vw - ${containerWidth / 2}px)`;
+            const tooltipWidth = HTML.tooltips.clientWidth;
+            HTML.tooltips.style.top = `calc(50vh + ${containerHeight / 4}px + 20px)`;
+            HTML.tooltips.style.left = `calc(50vw - ${tooltipWidth / 2}px)`;
         };
         repostion();
         window.addEventListener('resize', repostion);
@@ -125,9 +126,13 @@ export default class Game {
         this.movementManager.moveBallsAccordingly();
         this.visualManager.drawTable();
         this.visualManager.drawBalls();
-        if (Utils.areBallsStill(this.balls)) {
+        if (Utils.areBallsStill(this.balls) && !this.playerManager.isWhiteBallOut) {
             this.cueManager.releaseIfPullFinished();
             this.cueManager.drawCueAndProjection();
+        }
+        if (Utils.areBallsStill(this.balls) && this.playerManager.isWhiteBallOut && this.playerManager.hasCursorMoved) {
+            HTML.tableCanvas.style.cursor = "grabbing";
+            this.playerManager.drawWhiteBallProjection();
         }
         this.previousFrameTime = this.currentFrameTime || performance.now();
         this.currentFrameTime = performance.now();

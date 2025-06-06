@@ -80,4 +80,6 @@ export class Globals{
     static readonly PULL_DISTANCE_TO_POWER_FACTOR: number = 0.2;
     static readonly CUE_PULL_DISTANCE_FACTOR: number = 1.5;
     static readonly POWER_RELEASE_FACTOR: number = 0.3;
+    
+    static readonly BALL_DISAPPEAR_FACTOR = 0.9;
 }

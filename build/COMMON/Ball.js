@@ -2,8 +2,8 @@ import { Globals as G } from "./Globals.js";
 import { Circle, Vector2 } from "./Geometry.js";
 import Utils from "./Utils.js";
 export class Ball extends Circle {
-    constructor(ctx, centerPos, radius, { collisions = true, number = 0, velocity = new Vector2(0, 0), angle = Utils.degreesToRadians(90) } = {}) {
-        super(Ball.getColorByNumber(number), collisions, ctx, centerPos, radius, { velocity: velocity });
+    constructor(ctx, centerPos, { collisions = true, number = 0, velocity = new Vector2(0, 0), angle = Utils.degreesToRadians(90) } = {}) {
+        super(Ball.getColorByNumber(number), collisions, ctx, centerPos, G.BALL_RADIUS, { velocity: velocity });
         this.side = Ball.getSideByNumber(number);
         this.number = number;
         this.angle = angle;

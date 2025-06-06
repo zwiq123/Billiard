@@ -1,5 +1,6 @@
 import { Globals as G } from '../COMMON/Globals.js';
 import { Vector2 } from '../COMMON/Geometry.js';
+import Utils from '../COMMON/Utils.js';
 export default class MovementManager {
     constructor(game) {
         this.game = game;
@@ -7,11 +8,16 @@ export default class MovementManager {
     moveBallsAccordingly() {
         for (let i = 0; i < this.game.balls.length; i++) {
             const ball = this.game.balls[i];
-            if (!this.isBallMoving(ball))
+            if (!Utils.isBallMoving(ball))
                 continue;
             this.adjustBallVelocity(ball);
-            this.game.collisionManager.resolveBallCollisionsWithWalls(ball);
+            this.game.collisionManager.resolveCollisions(ball);
             this.game.collisionManager.resolveBallCollisionsWithOtherBalls();
+            for (const hole of this.game.holes) {
+                if (Utils.isBallOnEdgeOfHole(ball, hole)) {
+                    this.game.playerManager.transferBall(ball);
+                }
+            }
         }
     }
     adjustBallVelocity(ball) {
@@ -23,8 +29,5 @@ export default class MovementManager {
         }
         const angularVelocity = ball.velocity.length() / ball.radius;
         ball.angle += angularVelocity * this.game.frameTime * G.BALL_ROTATION_FACTOR;
-    }
-    isBallMoving(ball) {
-        return ball.velocity.x != 0 || ball.velocity.y != 0;
     }
 }
