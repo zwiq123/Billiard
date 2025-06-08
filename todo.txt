@@ -28,6 +28,8 @@
 [x] add the white ball placement functions   
 [x] make ball starting positions random
 
+[ ] check ball transfers every turn and switch turns correctly if no ball was transferred/wrong ball was transferred
+
 [ ] make players have turns
 [ ] check for faults
 [ ] add players ui

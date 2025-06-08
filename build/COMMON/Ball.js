@@ -40,14 +40,24 @@ export class Ball extends Circle {
         const angleOffset = Utils.degreesToRadians(90) - this.angle;
         this.ctx.fillStyle = "white";
         this.ctx.beginPath();
-        this.ctx.arc(this.center.x + G.OFFSET_X, this.center.y + G.OFFSET_Y, this.radius, Utils.degreesToRadians(startAngle) - angleOffset, Utils.degreesToRadians(endAngle) - angleOffset);
+        if (this.ctx === G.CTX) {
+            this.ctx.arc(this.center.x + G.OFFSET_X, this.center.y + G.OFFSET_Y, this.radius, Utils.degreesToRadians(startAngle) - angleOffset, Utils.degreesToRadians(endAngle) - angleOffset);
+        }
+        else {
+            this.ctx.arc(this.center.x, this.center.y, this.radius, Utils.degreesToRadians(startAngle) - angleOffset, Utils.degreesToRadians(endAngle) - angleOffset);
+        }
         this.ctx.fill();
         this.ctx.closePath();
     }
     drawCenterCircle(radius) {
         this.ctx.fillStyle = "white";
         this.ctx.beginPath();
-        this.ctx.arc(this.center.x + G.OFFSET_X, this.center.y + G.OFFSET_Y, radius, 0, 2 * Math.PI);
+        if (this.ctx === G.CTX) {
+            this.ctx.arc(this.center.x + G.OFFSET_X, this.center.y + G.OFFSET_Y, radius, 0, 2 * Math.PI);
+        }
+        else {
+            this.ctx.arc(this.center.x, this.center.y, radius, 0, 2 * Math.PI);
+        }
         this.ctx.fill();
         this.ctx.closePath();
     }
@@ -59,7 +69,12 @@ export class Ball extends Circle {
         this.ctx.font = `bold ${fontSize}px Arial`;
         this.ctx.textAlign = "center";
         this.ctx.textBaseline = "middle";
-        this.ctx.translate(this.center.x + G.OFFSET_X, this.center.y + G.OFFSET_Y);
+        if (this.ctx === G.CTX) {
+            this.ctx.translate(this.center.x + G.OFFSET_X, this.center.y + G.OFFSET_Y);
+        }
+        else {
+            this.ctx.translate(this.center.x, this.center.y);
+        }
         this.ctx.rotate(this.angle);
         const metrics = this.ctx.measureText(textString);
         let yOffset = 0;

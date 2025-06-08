@@ -35,7 +35,7 @@ export default class Game{
         this.tableBorders = [];
 
         HTML.getMainContainer(containerID);
-        this.createCanvases();
+        this.setUpCanvases();
         this.repositionContainer();
     }
 
@@ -121,7 +121,7 @@ export default class Game{
         this.tableBorders.push(new Polygon(G.TABLE_BORDER_COLOR, false, G.CTX!, new Vector2(G.TABLE_WIDTH - G.TABLE_BORDER_WIDTH, 0), new Vector2(G.TABLE_WIDTH, 0), new Vector2(G.TABLE_WIDTH, G.TABLE_HEIGHT), new Vector2(G.TABLE_WIDTH - G.TABLE_BORDER_WIDTH, G.TABLE_HEIGHT)));
     }
 
-    createCanvases(){
+    setUpCanvases(){
         const tableCanvas = document.createElement('canvas');
         const dpr = window.devicePixelRatio || 1;
 
@@ -131,6 +131,11 @@ export default class Game{
         G.CTX.setTransform(dpr, 0, 0, dpr, 0, 0);
         HTML.mainContainer!.appendChild(tableCanvas);
         HTML.getTableCanvas();
+
+        HTML.leftPlayerCanvas.width = G.BALL_RADIUS * 9;
+        HTML.rightPlayerCanvas.width = G.BALL_RADIUS * 9;
+        HTML.leftPlayerCanvas.height = G.BALL_RADIUS * 2;
+        HTML.rightPlayerCanvas.height = G.BALL_RADIUS * 2;
     }
 
     repositionContainer(){

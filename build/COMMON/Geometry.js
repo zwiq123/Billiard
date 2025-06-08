@@ -12,7 +12,12 @@ export class Circle {
     }
     draw() {
         this.ctx.beginPath();
-        this.ctx.arc(this.center.x + G.OFFSET_X, this.center.y + G.OFFSET_Y, this.radius, 0, 2 * Math.PI);
+        if (this.ctx === G.CTX) {
+            this.ctx.arc(this.center.x + G.OFFSET_X, this.center.y + G.OFFSET_Y, this.radius, 0, 2 * Math.PI);
+        }
+        else {
+            this.ctx.arc(this.center.x, this.center.y, this.radius, 0, 2 * Math.PI);
+        }
         if (this.isHollow) {
             this.ctx.strokeStyle = this.color;
             this.ctx.lineWidth = this.borderWidth;
@@ -38,10 +43,20 @@ export class Polygon {
     draw() {
         this.ctx.fillStyle = this.color;
         this.ctx.beginPath();
-        this.ctx.moveTo(this.vertices[0].x + G.OFFSET_X, this.vertices[0].y + G.OFFSET_Y);
+        if (this.ctx === G.CTX) {
+            this.ctx.moveTo(this.vertices[0].x + G.OFFSET_X, this.vertices[0].y + G.OFFSET_Y);
+        }
+        else {
+            this.ctx.moveTo(this.vertices[0].x, this.vertices[0].y);
+        }
         for (let i = 1; i < this.vertices.length; i++) {
             const vertex = this.vertices[i];
-            this.ctx.lineTo(vertex.x + G.OFFSET_X, vertex.y + G.OFFSET_Y);
+            if (this.ctx === G.CTX) {
+                this.ctx.lineTo(vertex.x + G.OFFSET_X, vertex.y + G.OFFSET_Y);
+            }
+            else {
+                this.ctx.lineTo(vertex.x, vertex.y);
+            }
         }
         this.ctx.fill();
     }
@@ -61,8 +76,14 @@ export class Segment {
         this.ctx.lineWidth = width;
         this.ctx.lineCap = lineCap;
         this.ctx.beginPath();
-        this.ctx.moveTo(this.start.x + G.OFFSET_X, this.start.y + G.OFFSET_Y);
-        this.ctx.lineTo(this.end.x + G.OFFSET_X, this.end.y + G.OFFSET_Y);
+        if (this.ctx === G.CTX) {
+            this.ctx.moveTo(this.start.x + G.OFFSET_X, this.start.y + G.OFFSET_Y);
+            this.ctx.lineTo(this.end.x + G.OFFSET_X, this.end.y + G.OFFSET_Y);
+        }
+        else {
+            this.ctx.moveTo(this.start.x, this.start.y);
+            this.ctx.lineTo(this.end.x, this.end.y);
+        }
         this.ctx.stroke();
         this.ctx.closePath();
         this.ctx.setLineDash([]);

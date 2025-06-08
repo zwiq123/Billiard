@@ -6,7 +6,7 @@ import Player from "../COMMON/Player.js";
 import Utils from "../COMMON/Utils.js";
 export default class PlayerManager {
     constructor(game) {
-        this.players = [new Player(), new Player()];
+        this.players = [new Player(HTML.leftPlayerCanvas), new Player(HTML.rightPlayerCanvas)];
         this.currentPlayerIndex = 0;
         this.hasCursorMoved = false;
         this.isWhiteBallOut = false;
@@ -74,6 +74,7 @@ export default class PlayerManager {
             return;
         if (ballToTransfer.color === "white") {
             this.isWhiteBallOut = true;
+            this.switchPlayer();
             return;
         }
         if (ballToTransfer.color === "black") {
@@ -85,24 +86,29 @@ export default class PlayerManager {
                 if (this.filledPlayer.capturedBalls.length < 7) {
                     console.log(`Match over. Player ${1 - this.currentPlayerIndex} wins!`);
                 }
-                this.filledPlayer.capturedBalls.push(ballToTransfer);
             }
             else {
                 if (this.halfFilledPlayer.capturedBalls.length < 7) {
                     console.log(`Match over. Player ${1 - this.currentPlayerIndex} wins!`);
                 }
-                this.halfFilledPlayer.capturedBalls.push(ballToTransfer);
             }
+            this.transferBallToPlayerBank(ballToTransfer, this.currentPlayersSide);
             return;
         }
         if (!this.filledPlayer || !this.halfFilledPlayer) {
             this.assignPlayerSides(ballToTransfer);
         }
-        if (ballToTransfer.side === BallSide.FILLED) {
-            this.filledPlayer.capturedBalls.push(ballToTransfer);
+        this.transferBallToPlayerBank(ballToTransfer, ballToTransfer.side);
+    }
+    transferBallToPlayerBank(ball, side) {
+        if (side === BallSide.FILLED) {
+            this.filledPlayer.addBallToBank(ball);
         }
-        if (ballToTransfer.side === BallSide.HALF_FILLED) {
-            this.halfFilledPlayer.capturedBalls.push(ballToTransfer);
+        else {
+            this.halfFilledPlayer.addBallToBank(ball);
+        }
+        if (side !== this.currentPlayersSide) {
+            this.switchPlayer();
         }
     }
     assignPlayerSides(ball) {
@@ -120,5 +126,13 @@ export default class PlayerManager {
     switchPlayer() {
         this.currentPlayerIndex = 1 - this.currentPlayerIndex;
         this.currentPlayersSide = this.currentPlayersSide === BallSide.FILLED ? BallSide.HALF_FILLED : BallSide.FILLED;
+        if (this.currentPlayerIndex === 1) {
+            HTML.leftPlayerIcon.style.borderColor = "white";
+            HTML.rightPlayerIcon.style.borderColor = "black";
+        }
+        else {
+            HTML.leftPlayerIcon.style.borderColor = "black";
+            HTML.rightPlayerIcon.style.borderColor = "white";
+        }
     }
 }
