@@ -55,48 +55,53 @@ body{
     text-wrap: nowrap;
     z-index: -1;
     text-shadow: 1px 1px black;
+    text-align: center;
 }
 
 /* -----PLAYERS----- */
 
 #leftPlayer, #rightPlayer {
     width: 45vw;
+    min-width: 120px;
     max-width: 500px;
     height: 10vh;
     max-height: 125px;
     position: absolute;
-    bottom: 0;
+    bottom: 1px;
 }
 
 #leftPlayer {
     left: 0;
-    background: url('./assets/img/player_bg_left.png');
+    border: 0.6vmin double white;
+    background-color: var(--left-player-bg);
+    /* background: url('./assets/img/rect234.svg');
     background-size: 100% 100%;
-    background-repeat: no-repeat;
+    background-repeat: no-repeat; */
 }
 
 #rightPlayer {
     right: 0;
-    background: url('./assets/img/player_bg_right.png');
+    border: 0.6vmin double white;
+    background-color: var(--right-player-bg);
+    /* background: url('./assets/img/rect235.svg');
     background-size: 100% 100%;
-    background-repeat: no-repeat;
-} 
+    background-repeat: no-repeat; */
+}
 
 #leftPlayer canvas, #rightPlayer canvas {
     /* border: 1px solid black; */
     position: absolute;
-    top: 50%;
     max-width: 50%;
     max-height: 50%;
     aspect-ratio: 9 / 2;
 }
 
 #leftPlayer canvas {
-    right: 3%;
+    right: 2%;
 }
 
 #rightPlayer canvas {
-    left: 3%;
+    left: 2%;
 }
 
 .playerTag{
@@ -104,11 +109,23 @@ body{
     top: 15%;
     aspect-ratio: 1 / 1;
     height: 70%;
-    border: 2px solid black;
-    background: url('./assets/img/player.png'), url('./assets/img/wood_vertical.png');
-    background-position: center bottom, center center;
-    background-size: 90% 90%, 100% 100%;
+    border: 0.3vmin solid black;
+    background: url('./assets/img/wood_vertical.png');
+    background-position: center center;
+    background-size: 100% 100%;
     background-repeat: no-repeat;
+}
+
+.playerIcon{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: url('./assets/img/player.png');
+    background-size: 90% 90%;
+    background-repeat: no-repeat;
+    background-position: center bottom;
 }
 
 #leftPlayer .playerTag{
@@ -140,4 +157,36 @@ body{
 
 #menuBtn:hover {
     filter: brightness(0.8);
+}
+
+
+/* -----GAME OVER SCREEN----- */
+
+#gameOverScreen {
+    position: absolute;
+
+    top: 25%;
+    left: 17.5%;
+    aspect-ratio: 13 / 10;
+    width: 65%;
+    max-height: 50%;
+
+    border: 1px solid black;
+    border-radius: 20px;
+
+    background: url('./assets/img/wood_horizontal.png');
+    background-size: 100% 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+
+    text-wrap: nowrap;
+    overflow: hidden;
+
+    top: 75%;
+    opacity: 0;
+    transition: top 1s, opacity 1.1s;
+
 }

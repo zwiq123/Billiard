@@ -6,19 +6,27 @@
         <meta name="author" content="Juliusz Żwirek">
         <title>8-ball pool</title>
         <link rel="stylesheet" href="style.css">
-        <script src="build/game.js" type="module" defer></script>
+        <script src="build/Game.js" type="module" defer></script>
     </head>
     <body>
         <div id="mainContainer"></div>
         <div id="tooltips">pull back on the cue to launch the cue ball forward</div>
         <div id="leftPlayer">
-            <div class="playerTag"></div>
+            <div class="playerTag">
+                <div class="playerIcon" style="filter: invert()"></div>
+            </div>
             <canvas></canvas>
         </div>
         <div id="rightPlayer">
-            <div class="playerTag"></div>
+            <div class="playerTag">
+                <div class="playerIcon"></div>
+            </div>
             <canvas></canvas>
         </div>
         <div id="menuBtn"></div>
+
+        <div id="gameOverScreen">
+            GAME OVER
+        </div>
     </body>
 </html>

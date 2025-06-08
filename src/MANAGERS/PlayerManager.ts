@@ -6,6 +6,7 @@ import Player from "../COMMON/Player.js";
 import Utils from "../COMMON/Utils.js";
 import Game from "../Game.js";
 import TurnData from "../COMMON/TurnData.js";
+import Tooltips from "../COMMON/Tooltips.js";
 
 export default class PlayerManager {
     private game: Game;
@@ -13,15 +14,15 @@ export default class PlayerManager {
     public filledPlayer: Player;
     public halfFilledPlayer: Player;    
 
-    public previousTurn: TurnData | null;
-    public currentTurn: TurnData = new TurnData(BallSide.NONE);
-
     private currentPlayerIndex: number = 0;
-    private currentPlayersSide: BallSide;
+    private currentPlayerSide: BallSide = BallSide.NONE;
 
     public hasCursorMoved: boolean = false;
     public isWhiteBallOut: boolean = false;
     private whiteBallProjection: Ball = Utils.getNewWhiteBall();
+
+    public wereBallsMoving = false;
+    private ballsTransferredDuringTurn: Ball[] = [];
 
     constructor(game: Game) {
         this.game = game;
@@ -92,28 +93,15 @@ export default class PlayerManager {
 
         if(!transferredBall) return;
 
-        if(ballToTransfer.color === "white") {
+        if(ballToTransfer.side === BallSide.CUE) {
             this.isWhiteBallOut = true;
-            this.switchPlayer();
+            this.ballsTransferredDuringTurn.push(ballToTransfer);
             return;
         }
 
-        if(ballToTransfer.color === "black") {
-            if(!this.filledPlayer || !this.halfFilledPlayer) {
-                console.log(`Match over. Player ${1 - this.currentPlayerIndex} wins!`);
-                return;
-            }
-
-            if(this.currentPlayersSide === BallSide.FILLED) {
-                if(this.filledPlayer.capturedBalls.length < 7){
-                    console.log(`Match over. Player ${1 - this.currentPlayerIndex} wins!`)
-                }
-            } else {
-                if(this.halfFilledPlayer.capturedBalls.length < 7){
-                    console.log(`Match over. Player ${1 - this.currentPlayerIndex} wins!`)
-                }
-            }
-            this.transferBallToPlayerBank(ballToTransfer, this.currentPlayersSide);
+        if(ballToTransfer.side === BallSide.BLACK) {
+            
+            this.transferBallToPlayerBank(ballToTransfer);
             return;
         }
 
@@ -124,15 +112,18 @@ export default class PlayerManager {
         this.transferBallToPlayerBank(ballToTransfer, ballToTransfer.side);
     }
 
-    private transferBallToPlayerBank(ball: Ball, side: BallSide){
+    private transferBallToPlayerBank(ball: Ball, side: BallSide = BallSide.NONE){
+        this.ballsTransferredDuringTurn.push(ball);
+
+        if(ball.side === BallSide.BLACK){
+            this.players[this.currentPlayerIndex].addBallToBank(ball);
+            return;
+        }
+
         if(side === BallSide.FILLED) {
             this.filledPlayer.addBallToBank(ball);
         } else {
             this.halfFilledPlayer.addBallToBank(ball);
-        }
-
-        if(side !== this.currentPlayersSide){
-            this.switchPlayer();
         }
     }
 
@@ -140,23 +131,71 @@ export default class PlayerManager {
         if(ball.side === BallSide.FILLED) {
             this.filledPlayer = this.players[this.currentPlayerIndex];
             this.halfFilledPlayer = this.players[1 - this.currentPlayerIndex];
-            this.currentPlayersSide = BallSide.FILLED;
+            this.currentPlayerSide = BallSide.FILLED;
         } else if(ball.side === BallSide.HALF_FILLED) {
             this.halfFilledPlayer = this.players[this.currentPlayerIndex];
             this.filledPlayer = this.players[1 - this.currentPlayerIndex];
-            this.currentPlayersSide = BallSide.HALF_FILLED;
+            this.currentPlayerSide = BallSide.HALF_FILLED;
         }
     }
 
     public switchPlayer() {
         this.currentPlayerIndex = 1 - this.currentPlayerIndex;
-        this.currentPlayersSide = this.currentPlayersSide === BallSide.FILLED ? BallSide.HALF_FILLED : BallSide.FILLED;
-        if(this.currentPlayerIndex === 1) {
-            HTML.leftPlayerIcon.style.borderColor = "white";
-            HTML.rightPlayerIcon.style.borderColor = "black";
+
+        if(this.currentPlayerSide !== BallSide.NONE) {
+            this.currentPlayerSide = this.currentPlayerSide === BallSide.FILLED ? BallSide.HALF_FILLED : BallSide.FILLED;
+        }
+
+        if(this.currentPlayerIndex === 0) {
+            HTML.leftPlayerTag.style.borderColor = "white";
+            HTML.leftPlayerIcon.style.filter = "invert()";
+            HTML.rightPlayerTag.style.borderColor = "black";
+            HTML.rightPlayerIcon.style.filter = "none";
         }else {
-            HTML.leftPlayerIcon.style.borderColor = "black";
-            HTML.rightPlayerIcon.style.borderColor = "white";
+            HTML.leftPlayerTag.style.borderColor = "black";
+            HTML.leftPlayerIcon.style.filter = "none";
+            HTML.rightPlayerTag.style.borderColor = "white";
+            HTML.rightPlayerIcon.style.filter = "invert()";
+        }
+    }
+
+    public nextTurnIfTime(areBallsMovingNow: boolean){
+        const ballsJustStoppedNow = this.wereBallsMoving && !areBallsMovingNow;
+
+        this.wereBallsMoving = areBallsMovingNow;
+        
+        if(!ballsJustStoppedNow) return;
+
+        const currentTurn = new TurnData(this.currentPlayerSide, this.ballsTransferredDuringTurn);
+        this.ballsTransferredDuringTurn = [];
+        if(!currentTurn.capturedAnyBalls()){
+            Tooltips.set(Tooltips.NO_BALL_POCKETED);
+            this.switchPlayer();
+            return;
+        }
+
+        if(currentTurn.capturedBlackBall()){
+            if(this.players[this.currentPlayerIndex].capturedBalls.length === 8){
+                HTML.gameOverScreen.style.top = "25%";
+                HTML.gameOverScreen.style.opacity = "1";
+                console.log(`Player ${this.currentPlayerIndex} wins by capturing the 8-ball!`)
+            } else {
+                HTML.gameOverScreen.style.top = "25%";
+                HTML.gameOverScreen.style.opacity = "1";
+                console.log(`Player ${1 - this.currentPlayerIndex} wins by the other player's premature 8-ball capture!`)
+            }
+            return;
+        }
+
+        if(currentTurn.capturedCueBall()) {
+            Tooltips.set(Tooltips.CUE_BALL_POCKETED);
+            this.switchPlayer();
+            return;
+        }
+
+        if(currentTurn.capturedOpponentsBall()){
+            Tooltips.set(Tooltips.OPPONENTS_BALL_POCKETED);
+            this.switchPlayer();
         }
     }
 }

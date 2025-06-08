@@ -28,13 +28,16 @@
 [x] add the white ball placement functions   
 [x] make ball starting positions random
 
-[ ] check ball transfers every turn and switch turns correctly if no ball was transferred/wrong ball was transferred
+[x] check ball transfers every turn and switch turns correctly if no ball was transferred/wrong ball was transferred
 
-[ ] make players have turns
-[ ] check for faults
+[x] make players have turns
+[x] check for faults
+[x] make tooltips
+
 [ ] add players ui
 [ ] add the black ball loss
 [ ] add the black ball finish (+ research)
 [ ] add menu
-[ ] make tooltips
+
+
 [ ] add bot

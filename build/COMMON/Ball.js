@@ -13,8 +13,10 @@ export class Ball extends Circle {
         return (_a = BALL_COLORS[number]) !== null && _a !== void 0 ? _a : "white";
     }
     static getSideByNumber(number) {
-        if (number === 0 || number === 8)
-            return BallSide.NONE;
+        if (number === 0)
+            return BallSide.CUE;
+        if (number === 8)
+            return BallSide.BLACK;
         if (number < 8)
             return BallSide.FILLED;
         if (number < 16)
@@ -23,17 +25,15 @@ export class Ball extends Circle {
     }
     draw() {
         super.draw();
-        if (this.number != 0) {
-            if (this.side == BallSide.FILLED || this.number == 8) {
-                this.drawCenterCircle(this.radius / 2);
-                this.drawCenteredText(this.radius * 0.8);
-            }
-            else if (this.side == BallSide.HALF_FILLED) {
-                this.drawCenterCircle(this.radius / 2.5);
-                this.drawHalfFilledBallSide(300, 60);
-                this.drawHalfFilledBallSide(120, 240);
-                this.drawCenteredText(this.radius * 0.6);
-            }
+        if (this.side === BallSide.FILLED || this.side === BallSide.BLACK) {
+            this.drawCenterCircle(this.radius / 2);
+            this.drawCenteredText(this.radius * 0.8);
+        }
+        else if (this.side === BallSide.HALF_FILLED) {
+            this.drawCenterCircle(this.radius / 2.5);
+            this.drawHalfFilledBallSide(300, 60);
+            this.drawHalfFilledBallSide(120, 240);
+            this.drawCenteredText(this.radius * 0.6);
         }
     }
     drawHalfFilledBallSide(startAngle, endAngle) {
@@ -110,5 +110,7 @@ export var BallSide;
 (function (BallSide) {
     BallSide["FILLED"] = "filled";
     BallSide["HALF_FILLED"] = "half-filled";
+    BallSide["BLACK"] = "black";
+    BallSide["CUE"] = "cue";
     BallSide["NONE"] = "none";
 })(BallSide || (BallSide = {}));

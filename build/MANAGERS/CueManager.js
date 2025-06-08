@@ -3,6 +3,7 @@ import { ElementsHTML as HTML } from "../COMMON/ElementsHTML.js";
 import { Circle, Segment, Vector2 } from "../COMMON/Geometry.js";
 import Utils from "../COMMON/Utils.js";
 import CollisionManager from "./CollisionManager.js";
+import Tooltips from "../COMMON/Tooltips.js";
 export default class CueManager {
     constructor(game) {
         this.cursorPos = new Vector2(G.TABLE_WIDTH / 2, G.TABLE_HEIGHT / 2);
@@ -109,6 +110,7 @@ export default class CueManager {
             const decay = Math.max(1, this.power * G.POWER_RELEASE_FACTOR);
             this.power = Math.max(0, this.power - decay);
             if (this.power === 0) {
+                Tooltips.set("");
                 this.whiteBall.velocity = this.getBallHitForce();
                 this.truePower = 0;
                 this.touchPos = null;

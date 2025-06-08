@@ -5,6 +5,7 @@ import { Ball } from "../COMMON/Ball.js";
 import Game from "../Game.js";
 import Utils from "../COMMON/Utils.js";
 import CollisionManager from "./CollisionManager.js";
+import Tooltips from "../COMMON/Tooltips.js";
 
 
 export default class CueManager{
@@ -151,6 +152,7 @@ export default class CueManager{
             this.power = Math.max(0, this.power - decay);
 
             if(this.power === 0){
+                Tooltips.set("");
                 this.whiteBall.velocity = this.getBallHitForce();
                 this.truePower = 0;
                 this.touchPos = null;

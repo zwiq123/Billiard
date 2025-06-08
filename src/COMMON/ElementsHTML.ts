@@ -12,15 +12,24 @@ export class ElementsHTML{
 
     public static tooltips: HTMLElement = document.getElementById('tooltips')!;
 
+    //-----PLAYER MENUS-----
+
     private static leftPlayerContainer: HTMLElement = document.getElementById('leftPlayer')!;
     private static rightPlayerContainer: HTMLElement = document.getElementById('rightPlayer')!;
 
-    public static leftPlayerIcon: HTMLElement = ElementsHTML.leftPlayerContainer.querySelector('.playerTag')!;
-    public static rightPlayerIcon: HTMLElement = ElementsHTML.rightPlayerContainer.querySelector('.playerTag')!;
+    public static leftPlayerTag: HTMLElement = ElementsHTML.leftPlayerContainer.querySelector('.playerTag')!;
+    public static rightPlayerTag: HTMLElement = ElementsHTML.rightPlayerContainer.querySelector('.playerTag')!;
+
+    public static leftPlayerIcon: HTMLElement = ElementsHTML.leftPlayerTag.querySelector('.playerIcon')!;
+    public static rightPlayerIcon: HTMLElement = ElementsHTML.rightPlayerTag.querySelector('.playerIcon')!;
 
     public static leftPlayerCanvas: HTMLCanvasElement = ElementsHTML.leftPlayerContainer.querySelector('canvas')!;
     public static rightPlayerCanvas: HTMLCanvasElement = ElementsHTML.rightPlayerContainer.querySelector('canvas')!;
 
+    //----- ------
+
     public static menuBtn: HTMLElement = document.getElementById('menuBtn')!;
+
+    public static gameOverScreen: HTMLElement = document.getElementById('gameOverScreen')!;
 
 }

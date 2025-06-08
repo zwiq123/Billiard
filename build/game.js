@@ -22,6 +22,7 @@ export default class Game {
         this.previousFrameTime = 0;
         this.currentFrameTime = 0;
         this.frameTime = 0;
+        this.isGameOver = false;
         this.balls = [];
         this.walls = [];
         this.holes = [];
@@ -114,30 +115,23 @@ export default class Game {
         HTML.rightPlayerCanvas.height = G.BALL_RADIUS * 2;
     }
     repositionContainer() {
-        const repostion = () => {
-            const containerWidth = HTML.mainContainer.clientWidth;
-            const containerHeight = HTML.mainContainer.clientHeight;
-            HTML.mainContainer.style.top = `calc(50vh - ${containerHeight / 2}px)`;
-            HTML.mainContainer.style.left = `calc(50vw - ${containerWidth / 2}px)`;
-            const tooltipWidth = HTML.tooltips.clientWidth;
-            HTML.tooltips.style.top = `calc(50vh + ${containerHeight / 4}px + 20px)`;
-            HTML.tooltips.style.left = `calc(50vw - ${tooltipWidth / 2}px)`;
-        };
-        repostion();
-        window.addEventListener('resize', repostion);
+        Utils.repostion();
+        window.addEventListener('resize', Utils.repostion);
     }
     updateGame() {
         this.movementManager.moveBallsAccordingly();
         this.visualManager.drawTable();
         this.visualManager.drawBalls();
-        if (Utils.areBallsStill(this.balls) && !this.playerManager.isWhiteBallOut) {
+        const areBallsMovingNow = !Utils.areBallsStill(this.balls);
+        if (!areBallsMovingNow && !this.playerManager.isWhiteBallOut) {
             this.cueManager.releaseIfPullFinished();
             this.cueManager.drawCueAndProjection();
         }
-        if (Utils.areBallsStill(this.balls) && this.playerManager.isWhiteBallOut && this.playerManager.hasCursorMoved) {
+        if (!areBallsMovingNow && this.playerManager.isWhiteBallOut && this.playerManager.hasCursorMoved) {
             HTML.tableCanvas.style.cursor = "grabbing";
             this.playerManager.drawWhiteBallProjection();
         }
+        this.playerManager.nextTurnIfTime(areBallsMovingNow);
         this.previousFrameTime = this.currentFrameTime || performance.now();
         this.currentFrameTime = performance.now();
         this.frameTime = (this.currentFrameTime - this.previousFrameTime) / 1000;

@@ -1,4 +1,5 @@
 import { Globals as G } from "./Globals.js";
+import { ElementsHTML as HTML } from "./ElementsHTML.js";
 import { Vector2 } from "./Geometry.js";
 import { Ball } from "./Ball.js";
 export default class Utils {
@@ -8,6 +9,28 @@ export default class Utils {
     static isOrientationPortrait() {
         const orientation = window.innerWidth > window.innerHeight ? false : true;
         return orientation;
+    }
+    static repostion() {
+        const containerWidth = HTML.mainContainer.clientWidth;
+        const containerHeight = HTML.mainContainer.clientHeight;
+        HTML.mainContainer.style.top = `calc(50vh - ${containerHeight / 2}px)`;
+        HTML.mainContainer.style.left = `calc(50vw - ${containerWidth / 2}px)`;
+        Utils.repositionTooltips();
+        const canvasHeight = HTML.rightPlayerCanvas.clientHeight;
+        HTML.leftPlayerCanvas.style.top = `calc(65% - ${canvasHeight / 2}px)`;
+        HTML.rightPlayerCanvas.style.top = `calc(65% - ${canvasHeight / 2}px)`;
+    }
+    static repositionTooltips() {
+        const containerHeight = HTML.mainContainer.clientHeight;
+        if (Utils.isOrientationPortrait()) {
+            HTML.tooltips.style.display = "none";
+        }
+        else {
+            HTML.tooltips.style.display = "block";
+            const tooltipWidth = HTML.tooltips.clientWidth;
+            HTML.tooltips.style.top = `calc(50vh + ${containerHeight / 4}px + 20px)`;
+            HTML.tooltips.style.left = `calc(50vw - ${tooltipWidth / 2}px)`;
+        }
     }
     static areBallsStill(balls) {
         for (const ball of balls) {

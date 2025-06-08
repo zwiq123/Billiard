@@ -25,9 +25,7 @@ export default class Player {
         this.drawPlayerBank();
     }
     drawPlayerBank() {
-        console.log(this.bank.width, this.bank.height);
         for (const ball of this.ballsLeftToCapture) {
-            console.log(ball.center);
             ball.draw();
         }
         for (const ball of this.capturedBalls) {

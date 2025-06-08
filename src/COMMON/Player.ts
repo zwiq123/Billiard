@@ -1,5 +1,5 @@
 import { Globals as G } from './Globals.js';
-import { Ball, BallSide } from './Ball.js';
+import { Ball } from './Ball.js';
 import { Circle, Vector2 } from './Geometry.js';
 
 
@@ -34,9 +34,7 @@ export default class Player {
     }
 
     private drawPlayerBank(){
-        console.log(this.bank.width, this.bank.height);
         for(const ball of this.ballsLeftToCapture){
-            console.log(ball.center);
             ball.draw();
         }
 
