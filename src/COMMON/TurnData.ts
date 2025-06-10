@@ -3,7 +3,10 @@ import { Ball, BallSide } from "./Ball.js";
 
 export default class TurnData{
     public transferredBalls: Ball[] = [];
-    public side: BallSide;    
+    public side: BallSide;  
+    
+    public static readonly PREMATURE_GAME_END = "premature";
+    public static readonly PROPER_GAME_END = "proper";
 
     constructor(side: BallSide, transferredBalls: Ball[]){
         this.side = side;

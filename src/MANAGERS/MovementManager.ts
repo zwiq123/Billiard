@@ -11,7 +11,7 @@ export default class MovementManager{
         this.game = game;
     }
 
-    moveBallsAccordingly(){
+    public moveBallsAccordingly(){
         for(let i=0; i < this.game.balls.length ; i++){
             const ball = this.game.balls[i];
             if(!Utils.isBallMoving(ball)) continue;
@@ -28,7 +28,7 @@ export default class MovementManager{
         }
     }
 
-    adjustBallVelocity(ball: Ball){
+    private adjustBallVelocity(ball: Ball){
         ball.velocity = Vector2.multiplyByNum(ball.velocity, G.SLOW_DOWN_FACTOR);
 
         const absNewVelX = Math.abs(ball.velocity.x);

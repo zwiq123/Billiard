@@ -1,13 +1,14 @@
 import { Globals as G } from "./COMMON/Globals.js";
 import { ElementsHTML as HTML } from "./COMMON/ElementsHTML.js";
 import { Polygon, Circle, Vector2 } from "./COMMON/Geometry.js";
-import { Ball } from "./COMMON/Ball.js";
+import { Ball, BallSide } from "./COMMON/Ball.js";
 import Utils from "./COMMON/Utils.js";
 import VisualManager from "./MANAGERS/VisualManager.js";
 import MovementManager from './MANAGERS/MovementManager.js'
 import CollisionManager from "./MANAGERS/CollisionManager.js";
 import CueManager from "./MANAGERS/CueManager.js";
 import PlayerManager from "./MANAGERS/PlayerManager.js";
+import TurnData from "./COMMON/TurnData.js";
 
 
 export default class Game{
@@ -29,6 +30,8 @@ export default class Game{
     public frameTime: number = 0;
 
     public isGameOver = false;
+    private time: number = 0;
+    private timeString: string = "00:00";
 
     constructor(containerID: string){
         this.balls = [];
@@ -41,7 +44,7 @@ export default class Game{
         this.repositionContainer();
     }
 
-    async init(){
+    public async init(){
         this.tableData = await this.fetchTableSizes();
         this.visualManager = new VisualManager(this);
         this.createBalls();
@@ -52,16 +55,21 @@ export default class Game{
         this.collisionManager = new CollisionManager(this);
         this.playerManager = new PlayerManager(this);
         this.cueManager = new CueManager(this);
+        this.startCountingTime();
     }
 
-    fetchTableSizes(){
+    public restartGame() {
+        location.reload();
+    }
+
+    private fetchTableSizes(){
         return new Promise((resolve) => {
             fetch('./assets/table.json')
             .then(data => {resolve(data.json());})
         })
     }
 
-    createWalls(){
+    private createWalls(){
         const tableSidesData = this.tableData["table-sides"];
         const SQRT2 = Math.sqrt(2);
 
@@ -75,7 +83,7 @@ export default class Game{
         })
     }
 
-    createHoles(){
+    private createHoles(){
         const tableHoleData = this.tableData["holes"];
         const SQRT2 = Math.sqrt(2);
 
@@ -86,7 +94,7 @@ export default class Game{
         })
     }
 
-    createBalls(){
+    private createBalls(){
         this.balls.push(Utils.getNewWhiteBall());
         const ballPlacement = Utils.getRandomBallStartingPlacement();
 
@@ -111,19 +119,20 @@ export default class Game{
 
         for(let i=0;i<ballPositions.length;i++){
             for(let j=0;j<ballPositions[i].length;j++){
+                // if(ballPlacement[i][j] !== 8) continue;
                 this.balls.push(new Ball(G.CTX!, ballPositions[i][j], {number: ballPlacement[i][j]}));
             }
         }
     }
 
-    createTableBorders(){
+    private createTableBorders(){
         this.tableBorders.push(new Polygon(G.TABLE_BORDER_COLOR, false, G.CTX!, new Vector2(0, 0), new Vector2(G.TABLE_WIDTH, 0), new Vector2(G.TABLE_WIDTH, G.TABLE_BORDER_WIDTH), new Vector2(0, G.TABLE_BORDER_WIDTH)));
         this.tableBorders.push(new Polygon(G.TABLE_BORDER_COLOR, false, G.CTX!, new Vector2(0, 0), new Vector2(G.TABLE_BORDER_WIDTH, 0), new Vector2(G.TABLE_BORDER_WIDTH, G.TABLE_HEIGHT), new Vector2(0, G.TABLE_HEIGHT)));
         this.tableBorders.push(new Polygon(G.TABLE_BORDER_COLOR, false, G.CTX!, new Vector2(0, G.TABLE_HEIGHT - G.TABLE_BORDER_WIDTH), new Vector2(G.TABLE_WIDTH, G.TABLE_HEIGHT - G.TABLE_BORDER_WIDTH), new Vector2(G.TABLE_WIDTH, G.TABLE_HEIGHT), new Vector2(0, G.TABLE_HEIGHT)));
         this.tableBorders.push(new Polygon(G.TABLE_BORDER_COLOR, false, G.CTX!, new Vector2(G.TABLE_WIDTH - G.TABLE_BORDER_WIDTH, 0), new Vector2(G.TABLE_WIDTH, 0), new Vector2(G.TABLE_WIDTH, G.TABLE_HEIGHT), new Vector2(G.TABLE_WIDTH - G.TABLE_BORDER_WIDTH, G.TABLE_HEIGHT)));
     }
 
-    setUpCanvases(){
+    private setUpCanvases(){
         const tableCanvas = document.createElement('canvas');
         const dpr = window.devicePixelRatio || 1;
 
@@ -138,14 +147,19 @@ export default class Game{
         HTML.rightPlayerCanvas.width = G.BALL_RADIUS * 9;
         HTML.leftPlayerCanvas.height = G.BALL_RADIUS * 2;
         HTML.rightPlayerCanvas.height = G.BALL_RADIUS * 2;
+
+        HTML.gameOverTitleBallLeft.width = G.BALL_RADIUS*2;
+        HTML.gameOverTitleBallRight.width = G.BALL_RADIUS*2;
+        HTML.gameOverTitleBallLeft.height = G.BALL_RADIUS*2;
+        HTML.gameOverTitleBallRight.height = G.BALL_RADIUS*2;
     }
 
-    repositionContainer(){
+    private repositionContainer(){
         Utils.repostion();
         window.addEventListener('resize', Utils.repostion);
     }
 
-    updateGame(){
+    public updateGame(){
         this.movementManager.moveBallsAccordingly();
         this.visualManager.drawTable();
         this.visualManager.drawBalls();
@@ -167,11 +181,48 @@ export default class Game{
         this.currentFrameTime = performance.now();
         this.frameTime = (this.currentFrameTime - this.previousFrameTime) / 1000;
     }
+
+    private startCountingTime(){
+        const addSecond = () => {
+            if(this.isGameOver) return;
+            this.time++;
+            const minutes = Math.floor(this.time / 60);
+            const minutesStr = minutes < 10 ? `0${minutes}` : String(minutes);
+            const seconds = this.time - minutes * 60;
+            const secondsStr = seconds < 10 ? `0${seconds}` : String(seconds);
+            this.timeString = `${minutesStr}:${secondsStr}`;
+            HTML.timeExtraData.innerText = this.timeString;
+            setTimeout(addSecond, 1000);
+        }
+        addSecond();
+    }
+
+    public endGame(winnerIndex: number, endingType: string, totalTurns: number, {winnerSide = BallSide.NONE} = {}){
+        this.isGameOver = true;
+        HTML.gameOverScreen.style.top = "25%";
+        HTML.gameOverScreen.style.opacity = "1";
+
+        const winnerString = `Player ${winnerIndex+1} ${winnerSide === BallSide.NONE ? "" : `(${winnerSide})`}`;
+
+        HTML.gameOverTitle.innerText = `PLAYER ${winnerIndex+1} WINS`;
+        VisualManager.drawTitleBalls(winnerSide);
+        HTML.gameOverTurns.innerText = String(totalTurns);
+        HTML.gameOverTime.innerText = this.timeString;
+
+        if(endingType === TurnData.PREMATURE_GAME_END){
+            HTML.gameOverMessage.innerText = `${winnerString} wins the game because of the other player's premature 8-ball capture!`;
+        } else if(endingType === TurnData.PROPER_GAME_END){
+            HTML.gameOverMessage.innerText = `${winnerString} wins by proper 8-ball capture!`;
+        } else {
+            HTML.gameOverMessage.innerText = "??? What happened? How did the game end?!";
+        }
+    }
 }
 
 window.addEventListener("load", ()=>{
     const game = new Game("mainContainer");
     function gameLoop(){
+        if(game.isGameOver) return;
         requestAnimationFrame(gameLoop);
         game.updateGame();
     }

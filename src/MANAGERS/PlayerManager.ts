@@ -23,6 +23,7 @@ export default class PlayerManager {
 
     public wereBallsMoving = false;
     private ballsTransferredDuringTurn: Ball[] = [];
+    private totalTurns = 1;
 
     constructor(game: Game) {
         this.game = game;
@@ -167,6 +168,8 @@ export default class PlayerManager {
         if(!ballsJustStoppedNow) return;
 
         const currentTurn = new TurnData(this.currentPlayerSide, this.ballsTransferredDuringTurn);
+        this.totalTurns++;
+        HTML.turnExtraData.innerText = `Turn ${this.totalTurns}`;
         this.ballsTransferredDuringTurn = [];
         if(!currentTurn.capturedAnyBalls()){
             Tooltips.set(Tooltips.NO_BALL_POCKETED);
@@ -176,13 +179,10 @@ export default class PlayerManager {
 
         if(currentTurn.capturedBlackBall()){
             if(this.players[this.currentPlayerIndex].capturedBalls.length === 8){
-                HTML.gameOverScreen.style.top = "25%";
-                HTML.gameOverScreen.style.opacity = "1";
-                console.log(`Player ${this.currentPlayerIndex} wins by capturing the 8-ball!`)
+                this.game.endGame(this.currentPlayerIndex, TurnData.PROPER_GAME_END, this.totalTurns, {winnerSide: this.currentPlayerSide});
             } else {
-                HTML.gameOverScreen.style.top = "25%";
-                HTML.gameOverScreen.style.opacity = "1";
-                console.log(`Player ${1 - this.currentPlayerIndex} wins by the other player's premature 8-ball capture!`)
+                const winnerSide = this.currentPlayerSide === BallSide.NONE ? BallSide.NONE : this.currentPlayerSide === BallSide.FILLED ? BallSide.HALF_FILLED : BallSide.FILLED;
+                this.game.endGame(1 - this.currentPlayerIndex, TurnData.PREMATURE_GAME_END, this.totalTurns, {winnerSide: winnerSide});
             }
             return;
         }

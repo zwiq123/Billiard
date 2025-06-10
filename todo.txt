@@ -18,7 +18,7 @@
 [x] add the stick power by pulling
 [x?] add stick animation
 
-[ ] fix stick speed
+[x] fix stick speed
 [x] fix ball-ball collision
 
 [x] add players
@@ -34,10 +34,18 @@
 [x] check for faults
 [x] make tooltips
 
-[ ] add players ui
-[ ] add the black ball loss
-[ ] add the black ball finish (+ research)
-[ ] add menu
+[x] add the black ball loss
+[x] add the black ball finish (+ research)
+[x] add timer
+[x] add turn count
+[x] add settings (restart, ...?)
+[x] add restart after game over
+
+[ ] add README.md
 
 
+NOT DONE (maybe some day for fun):
+[ ] add graphics for table and balls
+[ ] add SoundManager
 [ ] add bot
+[ ] make balls 3d 

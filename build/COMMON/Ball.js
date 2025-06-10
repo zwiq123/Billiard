@@ -108,8 +108,8 @@ const BALL_COLORS = {
 };
 export var BallSide;
 (function (BallSide) {
-    BallSide["FILLED"] = "filled";
-    BallSide["HALF_FILLED"] = "half-filled";
+    BallSide["FILLED"] = "Filled balls";
+    BallSide["HALF_FILLED"] = "Half-filled balls";
     BallSide["BLACK"] = "black";
     BallSide["CUE"] = "cue";
     BallSide["NONE"] = "none";

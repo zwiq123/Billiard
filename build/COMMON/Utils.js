@@ -16,9 +16,15 @@ export default class Utils {
         HTML.mainContainer.style.top = `calc(50vh - ${containerHeight / 2}px)`;
         HTML.mainContainer.style.left = `calc(50vw - ${containerWidth / 2}px)`;
         Utils.repositionTooltips();
-        const canvasHeight = HTML.rightPlayerCanvas.clientHeight;
-        HTML.leftPlayerCanvas.style.top = `calc(65% - ${canvasHeight / 2}px)`;
-        HTML.rightPlayerCanvas.style.top = `calc(65% - ${canvasHeight / 2}px)`;
+        const playerCanvasHeight = HTML.rightPlayerCanvas.clientHeight;
+        const playerCanvasWidth = HTML.rightPlayerCanvas.clientWidth;
+        const playerCanvasLabelWidth = HTML.leftPlayerCanvasLabel.clientWidth;
+        HTML.leftPlayerCanvas.style.top = `calc(65% - ${playerCanvasHeight / 2}px)`;
+        HTML.rightPlayerCanvas.style.top = `calc(65% - ${playerCanvasHeight / 2}px)`;
+        HTML.leftPlayerCanvasLabel.style.marginRight = `${playerCanvasWidth / 2 - playerCanvasLabelWidth / 2}px`;
+        HTML.rightPlayerCanvasLabel.style.marginLeft = `${playerCanvasWidth / 2 - playerCanvasLabelWidth / 2}px`;
+        const extraDataContainerWidth = HTML.extraDataContainer.clientWidth;
+        HTML.extraDataContainer.style.left = `calc(50% - ${extraDataContainerWidth / 2}px)`;
     }
     static repositionTooltips() {
         const containerHeight = HTML.mainContainer.clientHeight;

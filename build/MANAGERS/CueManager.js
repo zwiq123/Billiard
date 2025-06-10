@@ -6,6 +6,7 @@ import CollisionManager from "./CollisionManager.js";
 import Tooltips from "../COMMON/Tooltips.js";
 export default class CueManager {
     constructor(game) {
+        this.showProjection = true;
         this.cursorPos = new Vector2(G.TABLE_WIDTH / 2, G.TABLE_HEIGHT / 2);
         this.touchPos = null;
         this.releasePos = null;
@@ -66,8 +67,17 @@ export default class CueManager {
         trajectory.draw(G.HIT_PROJECTION_COLOR, G.HIT_PROJECTION_WIDTH, { lineCap: "square", lineDash: G.HIT_PROJECTION_DASH });
         const endBallProjection = new Circle(G.HIT_PROJECTION_COLOR, false, G.CTX, collisionPoint, G.BALL_RADIUS, { isHollow: true, borderWidth: G.HIT_PROJECTION_WIDTH });
         endBallProjection.draw();
-        if (ballHit) {
+        if (ballHit && this.showProjection) {
             this.drawCollisionLines(ballHit, collisionPoint);
+        }
+    }
+    toggleProjection() {
+        this.showProjection = !this.showProjection;
+        if (this.showProjection) {
+            HTML.showProjectionBtnSettings.className = "";
+        }
+        else {
+            HTML.showProjectionBtnSettings.className = "off";
         }
     }
     drawCollisionLines(hitBall, collisionPoint) {

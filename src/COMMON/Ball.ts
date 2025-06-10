@@ -14,11 +14,11 @@ export class Ball extends Circle{
         this.angle = angle;
     }
 
-    static getColorByNumber(number: number): string{
+    private static getColorByNumber(number: number): string{
         return BALL_COLORS[number] ?? "white";
     }
 
-    static getSideByNumber(number: number): BallSide{
+    private static getSideByNumber(number: number): BallSide{
         if(number === 0) return BallSide.CUE;
         if(number === 8) return BallSide.BLACK;
         if(number < 8) return BallSide.FILLED;
@@ -26,7 +26,7 @@ export class Ball extends Circle{
         return BallSide.NONE;
     }
 
-    draw(): void {
+    public draw(): void {
         super.draw();
     
         if(this.side === BallSide.FILLED || this.side === BallSide.BLACK){
@@ -124,8 +124,8 @@ const BALL_COLORS: Record<number, string> = {
 };
 
 export enum BallSide {
-    FILLED = "filled",
-    HALF_FILLED = "half-filled",
+    FILLED = "Filled balls",
+    HALF_FILLED = "Half-filled balls",
     BLACK = "black",
     CUE = "cue",
     NONE = "none"

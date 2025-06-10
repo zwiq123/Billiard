@@ -34,6 +34,7 @@ export default class Player {
     }
 
     private drawPlayerBank(){
+        this.CTX.clearRect(0, 0, this.bank.width, this.bank.height);
         for(const ball of this.ballsLeftToCapture){
             ball.draw();
         }

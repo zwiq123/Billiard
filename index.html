@@ -10,23 +10,58 @@
     </head>
     <body>
         <div id="mainContainer"></div>
+        <div id="extraDataContainer">
+            <div id="timeExtraData">00:00</div>
+            <div id="turnExtraData">Turn 1</div>
+        </div>
         <div id="tooltips">pull back on the cue to launch the cue ball forward</div>
         <div id="leftPlayer">
             <div class="playerTag">
                 <div class="playerIcon" style="filter: invert()"></div>
             </div>
-            <canvas></canvas>
+            <div class="ballContainer">
+                <div>Balls captured:</div>
+                <canvas></canvas>
+            </div>
         </div>
         <div id="rightPlayer">
             <div class="playerTag">
                 <div class="playerIcon"></div>
             </div>
-            <canvas></canvas>
+            <div class="ballContainer">
+                <div>Balls captured:</div>
+                <canvas></canvas>
+            </div>
         </div>
         <div id="menuBtn"></div>
 
+        <div id="settings">
+            <div id="closeSettingsBtn"></div>
+            <h1 id="settingsTitle">SETTINGS</h1>
+            <div id="settingsBtns">
+                <div id="showProjectionBtnSettings" title="turn on/of helping lines"></div>
+                <a id="infoBtnSettings" title="show game info" target="_blank" href="https://github.com/zwiq123/Billiard"></a>
+                <div id="restartBtnSettings" title="restart"></div>
+            </div>
+        </div>
+
         <div id="gameOverScreen">
-            GAME OVER
+            <div id="gameOverTitleContainer">
+                <canvas id="gameOverTitleBallLeft"></canvas>
+                <h1 id="gameOverTitle">PLAYER {} WINS</h1>
+                <canvas id="gameOverTitleBallRight"></canvas>
+            </div>
+            
+            <div id="gameOverData">
+                <div id="gameOverMessage">Player {} ({}) won by {}</div>
+                <div>
+                    <div>
+                        <div id="gameOverTime">Time elapsed: <span>{}</span></div>
+                        <div id="gameOverTurns">Turns taken: <span>{}</span></div>
+                    </div>
+                    <div id="restartBtnGameOverScreen" title="restart"></div>
+                </div>
+            </div>
         </div>
     </body>
 </html>

@@ -12,6 +12,8 @@ export default class CueManager{
     private game: Game
     private whiteBall: Ball;
 
+    private showProjection: boolean = true;
+
     private cursorPos: Vector2 = new Vector2(G.TABLE_WIDTH / 2, G.TABLE_HEIGHT / 2);
     private touchPos: Vector2 | null = null;
     private releasePos: Vector2 | null = null;
@@ -86,8 +88,17 @@ export default class CueManager{
         const endBallProjection = new Circle(G.HIT_PROJECTION_COLOR, false, G.CTX!, collisionPoint, G.BALL_RADIUS, {isHollow: true, borderWidth: G.HIT_PROJECTION_WIDTH});
         endBallProjection.draw();
 
-        if (ballHit) {
+        if (ballHit && this.showProjection) {
             this.drawCollisionLines(ballHit, collisionPoint);
+        }
+    }
+
+    public toggleProjection(){
+        this.showProjection = !this.showProjection;
+        if(this.showProjection) {
+            HTML.showProjectionBtnSettings.className = "";
+        }else {
+            HTML.showProjectionBtnSettings.className = "off";
         }
     }
 

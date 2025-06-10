@@ -1,5 +1,5 @@
 import { BallSide } from "./Ball.js";
-export default class TurnData {
+class TurnData {
     constructor(side, transferredBalls) {
         this.transferredBalls = [];
         this.side = side;
@@ -36,3 +36,6 @@ export default class TurnData {
         return false;
     }
 }
+TurnData.PREMATURE_GAME_END = "premature";
+TurnData.PROPER_GAME_END = "proper";
+export default TurnData;

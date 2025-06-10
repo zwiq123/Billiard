@@ -161,11 +161,11 @@ export class Vector2{
         return new Vector2(-wall.y, wall.x).normalized();
     }
 
-    length(): number{
+    public length(): number{
         return Math.hypot(this.x, this.y);
     }
 
-    normalized(): Vector2 {
+    public normalized(): Vector2 {
         const len = this.length();
         if (len === 0) return new Vector2(0, 0);
         return new Vector2(this.x / len, this.y / len);
