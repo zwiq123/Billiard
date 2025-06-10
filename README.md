@@ -1,4 +1,4 @@
-This is a simple Billiards game, you can player with another player (hot chair method).
+This is a simple Billiards game, you can play with another player (hot chair method - not online).
 What you need to run the game:
  - VS Code
  - VS Code extension - Live Server by Ritwick Dey (preferably)
